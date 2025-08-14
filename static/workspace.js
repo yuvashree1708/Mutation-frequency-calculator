@@ -302,7 +302,7 @@ class MutationWorkspace {
             pageLength: -1, // Show all rows (no pagination)
             lengthMenu: [[-1], ["All"]], // Only "All" option
             paging: false, // Disable pagination completely
-            scrollY: '65vh', // Vertical scrolling
+            scrollY: '70vh', // Increased vertical scrolling height
             scrollX: true, // Horizontal scrolling if needed
             scrollCollapse: true,
             order: [[0, 'asc']], // Sort by position

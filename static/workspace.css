@@ -185,10 +185,30 @@ body[data-workspace="chikv"] .history-item.active {
     overflow-y: auto;
     overflow-x: auto;
     flex-grow: 1;
-    max-height: 75vh;
+    max-height: 80vh;
     border: 1px solid var(--bs-border-color);
     border-radius: 12px;
     background: var(--bs-body-bg);
+    padding: 0;
+}
+
+/* Enhanced table wrapper for better vertical spacing */
+.dataTables_wrapper .dataTables_scrollBody {
+    padding: 0.5rem;
+}
+
+#dataTable_wrapper .dataTables_filter {
+    margin-bottom: 1.5rem;
+}
+
+#dataTable_wrapper .dataTables_filter input {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--bs-border-color);
+    background: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    width: 300px;
 }
 
 /* Welcome Message Styles */
@@ -239,56 +259,72 @@ body[data-workspace="chikv"] .history-item.active {
 
 #dataTable th {
     font-weight: 600;
-    font-size: 1rem;
-    padding: 1.25rem 1rem;
+    font-size: 1.1rem;
+    padding: 1.5rem 1.2rem;
     border-bottom: 2px solid var(--bs-border-color);
     text-align: center;
     white-space: nowrap;
-    min-width: 120px;
+    min-width: 140px;
     background: var(--bs-body-secondary);
     position: sticky;
     top: 0;
     z-index: 10;
+    letter-spacing: 0.02em;
 }
 
 #dataTable td {
-    padding: 1.2rem 1rem;
+    padding: 1.5rem 1.2rem;
     vertical-align: middle;
-    font-size: 1rem;
-    line-height: 1.5;
+    font-size: 1.1rem;
+    line-height: 1.6;
     text-align: center;
-    min-height: 70px;
+    min-height: 80px;
     word-wrap: break-word;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Specific column styling for better readability */
+/* Specific column styling for better readability with increased spacing */
 #dataTable th:nth-child(1), #dataTable td:nth-child(1) { /* Position */
-    min-width: 100px;
+    min-width: 120px;
     font-weight: 700;
+    font-size: 1.15rem;
 }
 
 #dataTable th:nth-child(2), #dataTable td:nth-child(2) { /* Reference */
-    min-width: 120px;
+    min-width: 140px;
     font-weight: 700;
+    font-size: 1.15rem;
 }
 
-#dataTable th:nth-child(3), #dataTable td:nth-child(3) { /* Counts */
-    min-width: 200px;
+#dataTable th:nth-child(3), #dataTable td:nth-child(3) { /* Status */
+    min-width: 160px;
+    font-size: 1.05rem;
 }
 
-#dataTable th:nth-child(4), #dataTable td:nth-child(4) { /* Frequencies */
-    min-width: 200px;
-}
-
-#dataTable th:nth-child(5), #dataTable td:nth-child(5) { /* Ambiguity */
-    min-width: 150px;
-}
-
-#dataTable th:nth-child(6), #dataTable td:nth-child(6) { /* Mutation Representation */
-    min-width: 300px;
-    max-width: 500px;
+#dataTable th:nth-child(4), #dataTable td:nth-child(4) { /* Mutation Representation */
+    min-width: 350px;
+    max-width: 600px;
     text-align: left;
-    padding-left: 1.5rem;
+    padding-left: 2rem;
+    font-size: 1.05rem;
+    font-family: 'Courier New', monospace;
+}
+
+#dataTable th:nth-child(5), #dataTable td:nth-child(5) { /* Confidence */
+    min-width: 140px;
+    font-size: 1.05rem;
+}
+
+#dataTable th:nth-child(6), #dataTable td:nth-child(6) { /* Raw Counts */
+    min-width: 250px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.95rem;
+}
+
+#dataTable th:nth-child(7), #dataTable td:nth-child(7) { /* Raw Frequencies */
+    min-width: 250px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.95rem;
 }
 
 #dataTable tbody tr {

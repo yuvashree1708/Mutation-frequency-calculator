@@ -19,7 +19,7 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 # Configuration
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'fasta', 'fa', 'txt', 'csv', 'fas', 'aln', 'seq', 'msa', 'phylip', 'phy', 'nex', 'nexus'}  # Support extensive alignment formats
-MAX_FILE_SIZE = 500 * 1024 * 1024  # 500MB for very large genomic datasets
+MAX_FILE_SIZE = 1024 * 1024 * 1024  # 1GB for very large genomic datasets
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
@@ -68,6 +68,7 @@ def upload_file(workspace_name):
     if not allowed_file(file.filename):
         return jsonify({'error': 'Invalid file format. Supported formats: FASTA, FA, TXT, CSV, FAS, ALN, SEQ, MSA, PHYLIP, PHY, NEX, NEXUS'}), 400
     
+    filepath = None
     try:
         # Generate unique file ID and save uploaded file
         file_id = str(uuid.uuid4())
@@ -116,8 +117,8 @@ def upload_file(workspace_name):
         # Add to workspace history (newest first)
         session[session_key].insert(0, file_entry)
         
-        # Keep only last 10 files per workspace
-        session[session_key] = session[session_key][:10]
+        # Keep only last 15 files per workspace (increased for larger storage)
+        session[session_key] = session[session_key][:15]
         session.modified = True
         
         logging.debug(f"File processed: {filename}, mutations at positions: {mutated_positions[:10]}...")
