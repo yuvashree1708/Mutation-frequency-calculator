@@ -423,6 +423,107 @@ body[data-workspace="chikv"] .file-icon {
     touch-action: manipulation;
 }
 
+/* Enhanced DataTable styling for clear position viewing */
+.dataTables_wrapper {
+    margin-top: 1rem;
+}
+
+.dataTables_filter input {
+    border-radius: 0.375rem;
+    border: 1px solid var(--bs-border-color);
+    padding: 0.375rem 0.75rem;
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+}
+
+.dataTables_length select {
+    border-radius: 0.375rem;
+    border: 1px solid var(--bs-border-color);
+    padding: 0.25rem 0.5rem;
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+}
+
+/* Enhanced table visibility for position viewing up to 50 */
+#dataTable {
+    font-size: 0.95rem;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+#dataTable th {
+    background-color: var(--bs-primary);
+    color: white;
+    font-weight: 600;
+    text-align: center;
+    padding: 0.75rem 0.5rem;
+    border: none;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+#dataTable td {
+    padding: 0.6rem 0.5rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--bs-border-color-translucent);
+}
+
+#dataTable tbody tr:nth-child(even) {
+    background-color: var(--bs-gray-50);
+}
+
+#dataTable tbody tr:hover {
+    background-color: var(--bs-primary-bg-subtle);
+    transform: scale(1.01);
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Position column highlighting - make positions 1-50 extra clear */
+#dataTable tbody td:first-child {
+    background-color: var(--bs-info-bg-subtle);
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: var(--bs-primary);
+    border-right: 2px solid var(--bs-primary);
+}
+
+/* Pagination styling */
+.dataTables_paginate .paginate_button {
+    padding: 0.375rem 0.75rem;
+    margin: 0 0.125rem;
+    border-radius: 0.375rem;
+    border: 1px solid var(--bs-border-color);
+    background: var(--bs-body-bg);
+    color: var(--bs-body-color);
+}
+
+.dataTables_paginate .paginate_button:hover {
+    background: var(--bs-primary);
+    color: white;
+    border-color: var(--bs-primary);
+}
+
+.dataTables_paginate .paginate_button.current {
+    background: var(--bs-primary);
+    color: white;
+    border-color: var(--bs-primary);
+}
+
+.dataTables_info {
+    color: var(--bs-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Mutation representation styling */
+.mutation-repr {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: var(--bs-danger);
+}
+
 .view-table-btn {
     min-height: 48px;
     font-weight: 500;

@@ -1,219 +1,353 @@
 Position,Reference,Counts,Frequencies (%),Ambiguity,Mutation Representation,Color
-1,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
-2,H,{'H': 153},{'H': 100.0},High-confidence,H (100.0%),Green
+1,D,{'D': 153},{'D': 100.0},High-confidence,D (100.0%),Green
+2,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
 3,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
-4,Q,{'Q': 153},{'Q': 100.0},High-confidence,Q (100.0%),Green
-5,V,"{'V': 38, 'I': 115}","{'V': 24.84, 'I': 75.16}",High-confidence,V5I(75.16%),Red
-6,D,{'D': 153},{'D': 100.0},High-confidence,D (100.0%),Green
-7,N,{'N': 153},{'N': 100.0},High-confidence,N (100.0%),Green
-8,F,{'F': 153},{'F': 100.0},High-confidence,F (100.0%),Green
-9,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
-10,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-11,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
-12,V,"{'V': 152, 'L': 1}","{'V': 99.35, 'L': 0.65}",High-confidence,V12L(0.65%),Red
+4,C,{'C': 153},{'C': 100.0},High-confidence,C (100.0%),Green
+5,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
+6,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
+7,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
+8,W,{'W': 153},{'W': 100.0},High-confidence,W (100.0%),Green
+9,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
+10,N,{'N': 153},{'N': 100.0},High-confidence,N (100.0%),Green
+11,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
+12,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
 13,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-14,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
-15,M,{'M': 153},{'M': 100.0},High-confidence,M (100.0%),Green
-16,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
-17,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-18,F,{'F': 153},{'F': 100.0},High-confidence,F (100.0%),Green
-19,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-20,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
-21,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
-22,M,{'M': 153},{'M': 100.0},High-confidence,M (100.0%),Green
-23,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-24,R,{'R': 153},{'R': 100.0},High-confidence,R (100.0%),Green
-25,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
-26,R,{'R': 153},{'R': 100.0},High-confidence,R (100.0%),Green
-27,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
-28,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
+14,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
+15,C,{'C': 153},{'C': 100.0},High-confidence,C (100.0%),Green
+16,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
+17,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
+18,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
+19,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
+20,F,{'F': 153},{'F': 100.0},High-confidence,F (100.0%),Green
+21,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
+22,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
+23,D,{'D': 153},{'D': 100.0},High-confidence,D (100.0%),Green
+24,N,{'N': 153},{'N': 100.0},High-confidence,N (100.0%),Green
+25,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
+26,H,{'H': 153},{'H': 100.0},High-confidence,H (100.0%),Green
+27,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
+28,W,{'W': 153},{'W': 100.0},High-confidence,W (100.0%),Green
 29,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
-30,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
-31,H,{'H': 153},{'H': 100.0},High-confidence,H (100.0%),Green
-32,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
-33,I,"{'I': 146, 'V': 7}","{'I': 95.42, 'V': 4.58}",High-confidence,I33V(4.58%),Red
-34,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-35,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-36,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
-37,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
-38,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
-39,S,"{'S': 81, 'A': 72}","{'S': 52.94, 'A': 47.06}",High-confidence,S39A(47.06%),Red
-40,F,{'F': 153},{'F': 100.0},High-confidence,F (100.0%),Green
-41,V,"{'V': 148, 'M': 5}","{'V': 96.73, 'M': 3.27}",High-confidence,V41M(3.27%),Red
-42,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
-43,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-44,I,"{'I': 152, 'L': 1}","{'I': 99.35, 'L': 0.65}",High-confidence,I44L(0.65%),Red
-45,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
-46,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
-47,N,{'N': 153},{'N': 100.0},High-confidence,N (100.0%),Green
-48,M,"{'M': 152, 'V': 1}","{'M': 99.35, 'V': 0.65}",High-confidence,M48V(0.65%),Red
-49,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
-50,F,{'F': 153},{'F': 100.0},High-confidence,F (100.0%),Green
-51,R,{'R': 153},{'R': 100.0},High-confidence,R (100.0%),Green
-52,D,{'D': 153},{'D': 100.0},High-confidence,D (100.0%),Green
-53,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-54,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
-55,R,{'R': 153},{'R': 100.0},High-confidence,R (100.0%),Green
-56,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
-57,M,{'M': 153},{'M': 100.0},High-confidence,M (100.0%),Green
-58,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
-59,M,{'M': 153},{'M': 100.0},High-confidence,M (100.0%),Green
+30,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
+31,Q,{'Q': 153},{'Q': 100.0},High-confidence,Q (100.0%),Green
+32,Y,{'Y': 153},{'Y': 100.0},High-confidence,Y (100.0%),Green
+33,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
+34,F,{'F': 153},{'F': 100.0},High-confidence,F (100.0%),Green
+35,Q,{'Q': 153},{'Q': 100.0},High-confidence,Q (100.0%),Green
+36,P,{'P': 153},{'P': 100.0},High-confidence,P (100.0%),Green
+37,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
+38,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
+39,P,{'P': 153},{'P': 100.0},High-confidence,P (100.0%),Green
+40,S,"{'S': 152, 'A': 1}","{'S': 99.35, 'A': 0.65}",High-confidence,S40A(0.65%),Red
+41,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
+42,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
+43,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
+44,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
+45,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
+46,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
+47,Q,{'Q': 153},{'Q': 100.0},High-confidence,Q (100.0%),Green
+48,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
+49,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
+50,H,"{'H': 150, 'Y': 3}","{'H': 98.04, 'Y': 1.96}",High-confidence,H50Y(1.96%),Red
+51,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
+52,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
+53,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
+54,I,"{'I': 152, 'V': 1}","{'I': 99.35, 'V': 0.65}",High-confidence,I54V(0.65%),Red
+55,C,{'C': 153},{'C': 100.0},High-confidence,C (100.0%),Green
+56,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
+57,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
+58,R,{'R': 153},{'R': 100.0},High-confidence,R (100.0%),Green
+59,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
 60,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
-61,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
-62,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
-63,T,"{'T': 148, 'A': 5}","{'T': 96.73, 'A': 3.27}",High-confidence,T63A(3.27%),Red
-64,M,{'M': 153},{'M': 100.0},High-confidence,M (100.0%),Green
-65,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
-66,D,{'D': 153},{'D': 100.0},High-confidence,D (100.0%),Green
-67,D,"{'D': 143, 'G': 10}","{'D': 93.46, 'G': 6.54}",High-confidence,D67G(6.54%),Red
-68,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
-69,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
-70,M,{'M': 153},{'M': 100.0},High-confidence,M (100.0%),Green
-71,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
-72,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
-73,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
-74,Y,{'Y': 153},{'Y': 100.0},High-confidence,Y (100.0%),Green
+61,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
+62,R,{'R': 153},{'R': 100.0},High-confidence,R (100.0%),Green
+63,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
+64,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
+65,N,{'N': 153},{'N': 100.0},High-confidence,N (100.0%),Green
+66,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
+67,M,{'M': 153},{'M': 100.0},High-confidence,M (100.0%),Green
+68,W,{'W': 153},{'W': 100.0},High-confidence,W (100.0%),Green
+69,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
+70,Q,{'Q': 153},{'Q': 100.0},High-confidence,Q (100.0%),Green
+71,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
+72,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
+73,P,{'P': 153},{'P': 100.0},High-confidence,P (100.0%),Green
+74,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
 75,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-76,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
-77,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-78,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-79,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
-80,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
-81,F,"{'F': 151, 'Y': 2}","{'F': 98.69, 'Y': 1.31}",High-confidence,F81Y(1.31%),Red
-82,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
-83,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
-84,R,{'R': 153},{'R': 100.0},High-confidence,R (100.0%),Green
-85,P,{'P': 153},{'P': 100.0},High-confidence,P (100.0%),Green
-86,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
-87,F,{'F': 153},{'F': 100.0},High-confidence,F (100.0%),Green
-88,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
-89,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
-90,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
-91,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-92,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-93,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-94,R,{'R': 153},{'R': 100.0},High-confidence,R (100.0%),Green
-95,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
-96,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-97,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
-98,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
-99,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
-100,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
-101,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-102,M,{'M': 153},{'M': 100.0},High-confidence,M (100.0%),Green
-103,M,{'M': 153},{'M': 100.0},High-confidence,M (100.0%),Green
-104,T,"{'T': 152, 'I': 1}","{'T': 99.35, 'I': 0.65}",High-confidence,T104I(0.65%),Red
-105,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
-106,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
-107,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
-108,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
-109,V,"{'V': 151, 'A': 2}","{'V': 98.69, 'A': 1.31}",High-confidence,V109A(1.31%),Red
-110,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
+76,N,{'N': 153},{'N': 100.0},High-confidence,N (100.0%),Green
+77,H,"{'H': 152, 'Y': 1}","{'H': 99.35, 'Y': 0.65}",High-confidence,H77Y(0.65%),Red
+78,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
+79,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
+80,S,"{'S': 29, 'T': 123, 'X': 1}","{'S': 19.08, 'T': 80.92}",Low-confidence,S80T(80.92%),Red
+81,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
+82,N,{'N': 153},{'N': 100.0},High-confidence,N (100.0%),Green
+83,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
+84,V,"{'V': 145, 'A': 2, 'I': 6}","{'V': 94.77, 'A': 1.31, 'I': 3.92}",High-confidence,"V84A(1.31%),V84I(3.92%)",Red
+85,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
+86,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
+87,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
+88,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
+89,M,{'M': 153},{'M': 100.0},High-confidence,M (100.0%),Green
+90,T,"{'T': 152, 'I': 1}","{'T': 99.35, 'I': 0.65}",High-confidence,T90I(0.65%),Red
+91,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
+92,D,{'D': 153},{'D': 100.0},High-confidence,D (100.0%),Green
+93,I,"{'I': 152, 'V': 1}","{'I': 99.35, 'V': 0.65}",High-confidence,I93V(0.65%),Red
+94,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
+95,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
+96,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
+97,M,{'M': 153},{'M': 100.0},High-confidence,M (100.0%),Green
+98,Q,{'Q': 153},{'Q': 100.0},High-confidence,Q (100.0%),Green
+99,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
+100,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
+101,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
+102,R,{'R': 153},{'R': 100.0},High-confidence,R (100.0%),Green
+103,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
+104,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
+105,R,{'R': 153},{'R': 100.0},High-confidence,R (100.0%),Green
+106,P,{'P': 153},{'P': 100.0},High-confidence,P (100.0%),Green
+107,Q,{'Q': 153},{'Q': 100.0},High-confidence,Q (100.0%),Green
+108,P,{'P': 153},{'P': 100.0},High-confidence,P (100.0%),Green
+109,T,"{'T': 152, 'A': 1}","{'T': 99.35, 'A': 0.65}",High-confidence,T109A(0.65%),Red
+110,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
 111,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-112,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
-113,Q,{'Q': 153},{'Q': 100.0},High-confidence,Q (100.0%),Green
+112,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
+113,Y,{'Y': 153},{'Y': 100.0},High-confidence,Y (100.0%),Green
 114,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
-115,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
-116,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
-117,P,{'P': 153},{'P': 100.0},High-confidence,P (100.0%),Green
-118,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
-119,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
-120,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
-121,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-122,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
-123,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-124,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
-125,D,{'D': 153},{'D': 100.0},High-confidence,D (100.0%),Green
-126,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
-127,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-128,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
-129,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-130,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
-131,M,{'M': 153},{'M': 100.0},High-confidence,M (100.0%),Green
-132,M,{'M': 153},{'M': 100.0},High-confidence,M (100.0%),Green
-133,V,"{'V': 147, 'A': 1, 'I': 5}","{'V': 96.08, 'A': 0.65, 'I': 3.27}",High-confidence,"V133A(0.65%),V133I(3.27%)",Red
+115,W,{'W': 153},{'W': 100.0},High-confidence,W (100.0%),Green
+116,K,"{'K': 152, 'R': 1}","{'K': 99.35, 'R': 0.65}",High-confidence,K116R(0.65%),Red
+117,T,"{'T': 43, 'A': 110}","{'T': 28.1, 'A': 71.9}",High-confidence,T117A(71.9%),Red
+118,W,{'W': 153},{'W': 100.0},High-confidence,W (100.0%),Green
+119,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
+120,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
+121,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
+122,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
+123,M,{'M': 153},{'M': 100.0},High-confidence,M (100.0%),Green
+124,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
+125,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
+126,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
+127,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
+128,S,"{'S': 39, 'L': 108, 'P': 6}","{'S': 25.49, 'L': 70.59, 'P': 3.92}",High-confidence,"S128L(70.59%),S128P(3.92%)",Red
+129,H,{'H': 153},{'H': 100.0},High-confidence,H (100.0%),Green
+130,N,{'N': 153},{'N': 100.0},High-confidence,N (100.0%),Green
+131,Q,"{'Q': 21, 'H': 132}","{'Q': 13.73, 'H': 86.27}",High-confidence,Q131H(86.27%),Red
+132,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
+133,F,{'F': 153},{'F': 100.0},High-confidence,F (100.0%),Green
 134,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-135,K,"{'K': 152, 'R': 1}","{'K': 99.35, 'R': 0.65}",High-confidence,K135R(0.65%),Red
-136,M,"{'M': 38, 'I': 115}","{'M': 24.84, 'I': 75.16}",High-confidence,M136I(75.16%),Red
-137,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
-138,R,{'R': 153},{'R': 100.0},High-confidence,R (100.0%),Green
-139,N,{'N': 153},{'N': 100.0},High-confidence,N (100.0%),Green
-140,M,{'M': 153},{'M': 100.0},High-confidence,M (100.0%),Green
-141,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
-142,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
-143,Y,{'Y': 153},{'Y': 100.0},High-confidence,Y (100.0%),Green
-144,Q,{'Q': 153},{'Q': 100.0},High-confidence,Q (100.0%),Green
-145,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-146,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
-147,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
-148,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
-149,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
-150,M,{'M': 153},{'M': 100.0},High-confidence,M (100.0%),Green
-151,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
-152,I,"{'I': 152, 'V': 1}","{'I': 99.35, 'V': 0.65}",High-confidence,I152V(0.65%),Red
+135,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
+136,D,{'D': 153},{'D': 100.0},High-confidence,D (100.0%),Green
+137,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
+138,P,{'P': 153},{'P': 100.0},High-confidence,P (100.0%),Green
+139,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
+140,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
+141,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
+142,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
+143,C,{'C': 153},{'C': 100.0},High-confidence,C (100.0%),Green
+144,P,{'P': 153},{'P': 100.0},High-confidence,P (100.0%),Green
+145,N,{'N': 153},{'N': 100.0},High-confidence,N (100.0%),Green
+146,T,"{'T': 152, 'I': 1}","{'T': 99.35, 'I': 0.65}",High-confidence,T146I(0.65%),Red
+147,N,{'N': 153},{'N': 100.0},High-confidence,N (100.0%),Green
+148,R,{'R': 153},{'R': 100.0},High-confidence,R (100.0%),Green
+149,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
+150,W,{'W': 153},{'W': 100.0},High-confidence,W (100.0%),Green
+151,N,{'N': 153},{'N': 100.0},High-confidence,N (100.0%),Green
+152,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
 153,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-154,C,{'C': 153},{'C': 100.0},High-confidence,C (100.0%),Green
+154,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
 155,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
-156,P,{'P': 153},{'P': 100.0},High-confidence,P (100.0%),Green
-157,N,{'N': 153},{'N': 100.0},High-confidence,N (100.0%),Green
-158,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
-159,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
-160,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
-161,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-162,Q,"{'Q': 59, 'R': 92, 'X': 2}","{'Q': 39.07, 'R': 60.93}",Low-confidence,Q162R(60.93%),Red
-163,N,{'N': 153},{'N': 100.0},High-confidence,N (100.0%),Green
-164,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
-165,W,{'W': 153},{'W': 100.0},High-confidence,W (100.0%),Green
-166,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
-167,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
-168,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
-169,C,{'C': 153},{'C': 100.0},High-confidence,C (100.0%),Green
-170,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
-171,I,"{'I': 50, 'A': 98, 'T': 5}","{'I': 32.68, 'A': 64.05, 'T': 3.27}",High-confidence,"I171A(64.05%),I171T(3.27%)",Red
-172,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-173,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
-174,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
-175,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
-176,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
+156,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
+157,D,{'D': 153},{'D': 100.0},High-confidence,D (100.0%),Green
+158,Y,{'Y': 153},{'Y': 100.0},High-confidence,Y (100.0%),Green
+159,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
+160,F,{'F': 153},{'F': 100.0},High-confidence,F (100.0%),Green
+161,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
+162,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
+163,F,{'F': 153},{'F': 100.0},High-confidence,F (100.0%),Green
+164,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
+165,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
+166,N,{'N': 153},{'N': 100.0},High-confidence,N (100.0%),Green
+167,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
+168,W,{'W': 153},{'W': 100.0},High-confidence,W (100.0%),Green
+169,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
+170,K,"{'K': 151, 'R': 2}","{'K': 98.69, 'R': 1.31}",High-confidence,K170R(1.31%),Red
+171,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
+172,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
+173,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
+174,K,"{'K': 43, 'R': 110}","{'K': 28.1, 'R': 71.9}",High-confidence,K174R(71.9%),Red
+175,Q,{'Q': 153},{'Q': 100.0},High-confidence,Q (100.0%),Green
+176,D,{'D': 153},{'D': 100.0},High-confidence,D (100.0%),Green
 177,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
-178,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
-179,P,{'P': 153},{'P': 100.0},High-confidence,P (100.0%),Green
-180,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-181,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-182,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-183,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
-184,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
+178,F,"{'F': 51, 'S': 102}","{'F': 33.33, 'S': 66.67}",High-confidence,F178S(66.67%),Red
+179,C,{'C': 153},{'C': 100.0},High-confidence,C (100.0%),Green
+180,D,{'D': 153},{'D': 100.0},High-confidence,D (100.0%),Green
+181,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
+182,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
+183,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
+184,M,{'M': 153},{'M': 100.0},High-confidence,M (100.0%),Green
 185,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
-186,Q,{'Q': 153},{'Q': 100.0},High-confidence,Q (100.0%),Green
-187,Q,{'Q': 153},{'Q': 100.0},High-confidence,Q (100.0%),Green
-188,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
-189,T,"{'T': 141, 'A': 12}","{'T': 92.16, 'A': 7.84}",High-confidence,T189A(7.84%),Red
+186,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
+187,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
+188,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
+189,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
 190,D,{'D': 153},{'D': 100.0},High-confidence,D (100.0%),Green
-191,W,{'W': 153},{'W': 100.0},High-confidence,W (100.0%),Green
-192,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
-193,P,{'P': 153},{'P': 100.0},High-confidence,P (100.0%),Green
-194,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-195,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
-196,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-197,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
-198,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
-199,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
-200,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
-201,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-202,N,{'N': 153},{'N': 100.0},High-confidence,N (100.0%),Green
-203,P,{'P': 153},{'P': 100.0},High-confidence,P (100.0%),Green
-204,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
-205,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
-206,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
-207,F,{'F': 153},{'F': 100.0},High-confidence,F (100.0%),Green
-208,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
+191,N,{'N': 153},{'N': 100.0},High-confidence,N (100.0%),Green
+192,R,{'R': 153},{'R': 100.0},High-confidence,R (100.0%),Green
+193,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
+194,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
+195,H,"{'H': 151, 'X': 2}",{'H': 100.0},Low-confidence,H (100.0%),Green
+196,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
+197,D,{'D': 153},{'D': 100.0},High-confidence,D (100.0%),Green
+198,M,{'M': 153},{'M': 100.0},High-confidence,M (100.0%),Green
+199,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
+200,Y,{'Y': 153},{'Y': 100.0},High-confidence,Y (100.0%),Green
+201,W,{'W': 153},{'W': 100.0},High-confidence,W (100.0%),Green
+202,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
+203,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
+204,S,"{'S': 152, 'X': 1}",{'S': 100.0},Low-confidence,S (100.0%),Green
+205,A,"{'A': 152, 'T': 1}","{'A': 99.35, 'T': 0.65}",High-confidence,A205T(0.65%),Red
+206,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
+207,N,"{'N': 152, 'X': 1}",{'N': 100.0},Low-confidence,N (100.0%),Green
+208,D,{'D': 153},{'D': 100.0},High-confidence,D (100.0%),Green
 209,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
-210,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
-211,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
-212,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
-213,R,{'R': 153},{'R': 100.0},High-confidence,R (100.0%),Green
-214,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
-215,S,"{'S': 148, 'N': 5}","{'S': 96.73, 'N': 3.27}",High-confidence,S215N(3.27%),Red
-216,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
-217,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
-218,R,{'R': 153},{'R': 100.0},High-confidence,R (100.0%),Green
+210,W,{'W': 153},{'W': 100.0},High-confidence,W (100.0%),Green
+211,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
+212,I,"{'I': 152, 'X': 1}",{'I': 100.0},Low-confidence,I (100.0%),Green
+213,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
+214,K,"{'K': 152, 'X': 1}",{'K': 100.0},Low-confidence,K (100.0%),Green
+215,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
+216,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
+217,F,"{'F': 152, 'X': 1}",{'F': 100.0},Low-confidence,F (100.0%),Green
+218,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
+219,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
+220,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
+221,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
+222,N,"{'N': 37, 'S': 115, 'X': 1}","{'N': 24.34, 'S': 75.66}",Low-confidence,N222S(75.66%),Red
+223,C,{'C': 153},{'C': 100.0},High-confidence,C (100.0%),Green
+224,H,{'H': 153},{'H': 100.0},High-confidence,H (100.0%),Green
+225,W,{'W': 153},{'W': 100.0},High-confidence,W (100.0%),Green
+226,P,{'P': 153},{'P': 100.0},High-confidence,P (100.0%),Green
+227,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
+228,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
+229,H,{'H': 153},{'H': 100.0},High-confidence,H (100.0%),Green
+230,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
+231,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
+232,W,{'W': 153},{'W': 100.0},High-confidence,W (100.0%),Green
+233,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
+234,N,{'N': 153},{'N': 100.0},High-confidence,N (100.0%),Green
+235,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
+236,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
+237,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
+238,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
+239,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
+240,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
+241,M,{'M': 153},{'M': 100.0},High-confidence,M (100.0%),Green
+242,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
+243,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
+244,P,{'P': 153},{'P': 100.0},High-confidence,P (100.0%),Green
+245,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
+246,N,{'N': 153},{'N': 100.0},High-confidence,N (100.0%),Green
+247,L,"{'L': 38, 'F': 115}","{'L': 24.84, 'F': 75.16}",High-confidence,L247F(75.16%),Red
+248,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
+249,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
+250,P,{'P': 153},{'P': 100.0},High-confidence,P (100.0%),Green
+251,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
+252,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
+253,Q,{'Q': 153},{'Q': 100.0},High-confidence,Q (100.0%),Green
+254,H,{'H': 153},{'H': 100.0},High-confidence,H (100.0%),Green
+255,N,{'N': 153},{'N': 100.0},High-confidence,N (100.0%),Green
+256,Y,{'Y': 153},{'Y': 100.0},High-confidence,Y (100.0%),Green
+257,R,{'R': 153},{'R': 100.0},High-confidence,R (100.0%),Green
+258,P,{'P': 153},{'P': 100.0},High-confidence,P (100.0%),Green
+259,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
+260,Y,{'Y': 153},{'Y': 100.0},High-confidence,Y (100.0%),Green
+261,H,{'H': 153},{'H': 100.0},High-confidence,H (100.0%),Green
+262,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
+263,Q,{'Q': 153},{'Q': 100.0},High-confidence,Q (100.0%),Green
+264,I,"{'I': 39, 'T': 114}","{'I': 25.49, 'T': 74.51}",High-confidence,I264T(74.51%),Red
+265,T,"{'T': 39, 'A': 114}","{'T': 25.49, 'A': 74.51}",High-confidence,T265A(74.51%),Red
+266,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
+267,P,{'P': 153},{'P': 100.0},High-confidence,P (100.0%),Green
+268,W,{'W': 153},{'W': 100.0},High-confidence,W (100.0%),Green
+269,H,{'H': 153},{'H': 100.0},High-confidence,H (100.0%),Green
+270,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
+271,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
+272,K,"{'K': 52, 'R': 101}","{'K': 33.99, 'R': 66.01}",High-confidence,K272R(66.01%),Red
+273,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
+274,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
+275,M,{'M': 153},{'M': 100.0},High-confidence,M (100.0%),Green
+276,D,{'D': 153},{'D': 100.0},High-confidence,D (100.0%),Green
+277,F,{'F': 153},{'F': 100.0},High-confidence,F (100.0%),Green
+278,D,"{'D': 146, 'N': 7}","{'D': 95.42, 'N': 4.58}",High-confidence,D278N(4.58%),Red
+279,F,{'F': 153},{'F': 100.0},High-confidence,F (100.0%),Green
+280,C,{'C': 153},{'C': 100.0},High-confidence,C (100.0%),Green
+281,D,"{'D': 147, 'E': 6}","{'D': 96.08, 'E': 3.92}",High-confidence,D281E(3.92%),Red
+282,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
+283,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
+284,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
+285,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
+286,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
+287,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
+288,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
+289,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
+290,D,{'D': 153},{'D': 100.0},High-confidence,D (100.0%),Green
+291,C,{'C': 153},{'C': 100.0},High-confidence,C (100.0%),Green
+292,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
+293,N,{'N': 153},{'N': 100.0},High-confidence,N (100.0%),Green
+294,R,{'R': 153},{'R': 100.0},High-confidence,R (100.0%),Green
+295,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
+296,P,{'P': 153},{'P': 100.0},High-confidence,P (100.0%),Green
+297,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
+298,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
+299,R,{'R': 153},{'R': 100.0},High-confidence,R (100.0%),Green
+300,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
+301,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
+302,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
+303,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green
+304,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
+305,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
+306,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
+307,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
+308,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
+309,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
+310,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
+311,W,{'W': 153},{'W': 100.0},High-confidence,W (100.0%),Green
+312,C,{'C': 153},{'C': 100.0},High-confidence,C (100.0%),Green
+313,C,{'C': 153},{'C': 100.0},High-confidence,C (100.0%),Green
+314,R,{'R': 153},{'R': 100.0},High-confidence,R (100.0%),Green
+315,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
+316,C,{'C': 153},{'C': 100.0},High-confidence,C (100.0%),Green
+317,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
+318,L,"{'L': 151, 'X': 2}",{'L': 100.0},Low-confidence,L (100.0%),Green
+319,P,{'P': 153},{'P': 100.0},High-confidence,P (100.0%),Green
+320,P,{'P': 153},{'P': 100.0},High-confidence,P (100.0%),Green
+321,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
+322,R,{'R': 153},{'R': 100.0},High-confidence,R (100.0%),Green
+323,Y,"{'Y': 152, 'F': 1}","{'Y': 99.35, 'F': 0.65}",High-confidence,Y323F(0.65%),Red
+324,R,"{'R': 147, 'K': 6}","{'R': 96.08, 'K': 3.92}",High-confidence,R324K(3.92%),Red
+325,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
+326,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
+327,D,{'D': 153},{'D': 100.0},High-confidence,D (100.0%),Green
+328,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
+329,C,{'C': 153},{'C': 100.0},High-confidence,C (100.0%),Green
+330,W,{'W': 153},{'W': 100.0},High-confidence,W (100.0%),Green
+331,Y,{'Y': 153},{'Y': 100.0},High-confidence,Y (100.0%),Green
+332,G,{'G': 153},{'G': 100.0},High-confidence,G (100.0%),Green
+333,M,{'M': 153},{'M': 100.0},High-confidence,M (100.0%),Green
+334,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
+335,I,{'I': 153},{'I': 100.0},High-confidence,I (100.0%),Green
+336,R,{'R': 153},{'R': 100.0},High-confidence,R (100.0%),Green
+337,P,{'P': 153},{'P': 100.0},High-confidence,P (100.0%),Green
+338,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
+339,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
+340,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
+341,K,{'K': 153},{'K': 100.0},High-confidence,K (100.0%),Green
+342,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
+343,E,{'E': 153},{'E': 100.0},High-confidence,E (100.0%),Green
+344,N,{'N': 153},{'N': 100.0},High-confidence,N (100.0%),Green
+345,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
+346,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
+347,N,{'N': 153},{'N': 100.0},High-confidence,N (100.0%),Green
+348,S,{'S': 153},{'S': 100.0},High-confidence,S (100.0%),Green
+349,L,{'L': 153},{'L': 100.0},High-confidence,L (100.0%),Green
+350,V,{'V': 153},{'V': 100.0},High-confidence,V (100.0%),Green
+351,T,{'T': 153},{'T': 100.0},High-confidence,T (100.0%),Green
+352,A,{'A': 153},{'A': 100.0},High-confidence,A (100.0%),Green

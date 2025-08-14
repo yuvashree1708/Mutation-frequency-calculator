@@ -371,16 +371,18 @@ class MutationWorkspace {
         
         tableBody.innerHTML = rowsHtml;
 
-        // Initialize DataTable with single scroll view and enhanced readability
+        // Initialize DataTable with enhanced visibility for positions up to 50
         this.dataTable = $('#dataTable').DataTable({
-            pageLength: -1, // Show all rows (no pagination)
-            lengthMenu: [[-1], ["All"]], // Only "All" option
-            paging: false, // Disable pagination completely
-            scrollY: '70vh', // Increased vertical scrolling height
+            pageLength: 50, // Show first 50 positions clearly
+            lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]], // Multiple page size options
+            paging: true, // Enable pagination for better position viewing
+            scrollY: '65vh', // Vertical scrolling height
             scrollX: true, // Horizontal scrolling if needed
             scrollCollapse: true,
             order: [[0, 'asc']], // Sort by position
-            dom: '<"row"<"col-sm-12"f>>rt', // Only show search and table (no pagination controls)
+            dom: '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
+                 '<"row"<"col-sm-12"tr>>' +
+                 '<"row"<"col-sm-5"i><"col-sm-7"p>>', // Show all controls including pagination
             columnDefs: [
                 {
                     targets: [5, 6], // Raw counts and frequencies columns
@@ -397,9 +399,10 @@ class MutationWorkspace {
             ],
             language: {
                 search: "Search positions and mutations:",
-                info: "", // Remove info display
-                infoEmpty: "",
-                infoFiltered: ""
+                info: "Showing _START_ to _END_ of _TOTAL_ positions",
+                infoEmpty: "No positions found",
+                infoFiltered: "(filtered from _MAX_ total positions)",
+                lengthMenu: "Show _MENU_ positions per page"
             },
             responsive: false,
             autoWidth: false,
