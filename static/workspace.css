@@ -640,10 +640,12 @@ body[data-workspace="chikv"] .file-icon {
     vertical-align: middle;
 }
 
-/* Analysis sidebar styling */
-.analysis-sidebar {
-    min-height: 100vh;
-    background-color: var(--bs-gray-50) !important;
+/* Upload panel styling on main page */
+.upload-panel {
+    position: sticky;
+    top: 1rem;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
 }
 
 .upload-area {
@@ -657,39 +659,40 @@ body[data-workspace="chikv"] .file-icon {
     background-color: var(--bs-primary-bg-subtle);
 }
 
-/* Enhanced table container for maximum space */
+/* Full width table container for analysis view */
 .table-container {
-    height: calc(100vh - 350px);
+    height: calc(100vh - 300px);
     overflow-y: auto;
 }
 
-.analysis-main {
-    display: flex;
-    flex-direction: column;
+.table-responsive {
+    height: 100%;
 }
 
-.table-responsive {
-    flex-grow: 1;
-    max-height: none;
+/* Files grid layout */
+.files-grid {
+    min-height: 400px;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .analysis-sidebar {
-        position: fixed;
-        top: 0;
-        right: -100%;
-        width: 280px;
-        z-index: 1050;
-        transition: right 0.3s ease;
-    }
-    
-    .analysis-sidebar.show {
-        right: 0;
+    .upload-panel {
+        position: static;
+        margin-top: 2rem;
+        max-height: none;
     }
     
     .table-container {
-        height: calc(100vh - 300px);
+        height: calc(100vh - 250px);
+    }
+    
+    /* Stack layout on mobile */
+    .files-section .row {
+        flex-direction: column-reverse;
+    }
+    
+    .files-section .col-lg-3 {
+        margin-bottom: 1rem;
     }
 }
 

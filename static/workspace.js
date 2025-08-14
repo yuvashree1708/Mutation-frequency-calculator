@@ -18,8 +18,8 @@ class MutationWorkspace {
     }
 
     setupEventListeners() {
-        // File upload handling with validation for both upload inputs
-        const fileInputs = ['fileInput', 'fileInputSidebar'];
+        // File upload handling with validation for all upload inputs
+        const fileInputs = ['fileInput', 'fileInputSidebar', 'fileInputMain'];
         fileInputs.forEach(inputId => {
             const input = document.getElementById(inputId);
             if (input) {
