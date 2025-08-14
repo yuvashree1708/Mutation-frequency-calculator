@@ -512,20 +512,11 @@ class MutationWorkspace {
         }
     }
 
-    showUploadProgress() {
-        const progress = document.getElementById('uploadProgress');
-        progress.classList.remove('d-none');
-        progress.querySelector('.progress-bar').style.width = '100%';
-    }
 
-    hideUploadProgress() {
-        const progress = document.getElementById('uploadProgress');
-        progress.classList.add('d-none');
-        progress.querySelector('.progress-bar').style.width = '0%';
-    }
 
     updateUploadStatus(message) {
-        document.getElementById('uploadStatus').textContent = message;
+        const status = document.getElementById('uploadStatus');
+        if (status) status.textContent = message;
     }
 
     showUploadProgress() {
@@ -544,27 +535,39 @@ class MutationWorkspace {
     }
 
     updateUploadProgress(percentage) {
-        const progressBar = document.querySelector('#upload-progress .progress-bar');
-        if (progressBar) {
-            progressBar.style.width = `${percentage}%`;
-            progressBar.setAttribute('aria-valuenow', percentage);
+        const progressContainer = document.getElementById('upload-progress');
+        if (progressContainer) {
+            const progressBar = progressContainer.querySelector('.progress-bar');
+            if (progressBar) {
+                progressBar.style.width = `${percentage}%`;
+                progressBar.setAttribute('aria-valuenow', percentage);
+            }
         }
     }
 
     showLoadingSpinner() {
-        document.getElementById('loadingSpinner').classList.remove('d-none');
-        document.getElementById('tableContainer').classList.add('d-none');
-        document.getElementById('welcomeMessage').classList.add('d-none');
+        const spinner = document.getElementById('loadingSpinner');
+        const table = document.getElementById('tableContainer');
+        const welcome = document.getElementById('welcomeMessage');
+        
+        if (spinner) spinner.classList.remove('d-none');
+        if (table) table.classList.add('d-none');
+        if (welcome) welcome.classList.add('d-none');
     }
 
     hideLoadingSpinner() {
-        document.getElementById('loadingSpinner').classList.add('d-none');
+        const spinner = document.getElementById('loadingSpinner');
+        if (spinner) spinner.classList.add('d-none');
     }
 
     showToast(title, message, type = 'info') {
         const toast = document.getElementById('toastNotification');
+        if (!toast) return;
+        
         const toastHeader = toast.querySelector('.toast-header');
         const toastBody = toast.querySelector('.toast-body');
+        
+        if (!toastHeader || !toastBody) return;
         
         // Update icon and colors based on type
         let icon = 'fas fa-info-circle';
