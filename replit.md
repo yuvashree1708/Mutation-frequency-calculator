@@ -5,6 +5,7 @@ This is an interactive bioinformatics web dashboard for analyzing mutation frequ
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
+File upload preferences: Maximum file size support (3GB per file) for large genomic datasets.
 
 # System Architecture
 
