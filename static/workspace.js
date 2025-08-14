@@ -186,7 +186,13 @@ class MutationWorkspace {
         this.showLoadingSpinner();
         
         fetch(`/api/${this.workspace}/file/${fileId}`)
-        .then(response => response.json())
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                return response.json().then(err => Promise.reject(err));
+            }
+        })
         .then(data => {
             if (data.success) {
                 this.currentFileId = fileId;
@@ -198,8 +204,10 @@ class MutationWorkspace {
             }
         })
         .catch(error => {
-            this.showToast('Error', 'Failed to load file data', 'danger');
+            const errorMessage = error.error || error.message || 'Failed to load file data';
+            this.showToast('File Error', errorMessage, 'danger');
             this.hideLoadingSpinner();
+            console.error('Load file error:', error);
         });
     }
 
@@ -410,16 +418,27 @@ class MutationWorkspace {
         
         const filename = document.getElementById('downloadBtn').getAttribute('data-filename');
         if (filename) {
-            // Create temporary link for download
-            const link = document.createElement('a');
-            link.href = `/download/${filename}`;
-            link.download = filename;
-            link.style.display = 'none';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            this.showToast('Download', 'CSV file download started', 'success');
+            // Check if file exists before attempting download
+            fetch(`/download/${filename}`, { method: 'HEAD' })
+            .then(response => {
+                if (response.ok) {
+                    // File exists, proceed with download
+                    const link = document.createElement('a');
+                    link.href = `/download/${filename}`;
+                    link.download = filename;
+                    link.style.display = 'none';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    this.showToast('Download', 'CSV file download started', 'success');
+                } else {
+                    this.showToast('Download Error', 'File not found on server', 'danger');
+                }
+            })
+            .catch(error => {
+                this.showToast('Download Error', 'Failed to access file', 'danger');
+            });
         }
     }
 

@@ -83,7 +83,15 @@ def upload_file(workspace_name):
         mutated_positions = [r['Position'] for r in results if r['Color'] == 'Red']
         low_conf_positions = [r['Position'] for r in results if r['Ambiguity'] == 'Low-confidence']
         
-        # Create file entry for workspace history
+        # Store results in a temporary file to avoid large sessions
+        import pickle
+        results_file = f"results_{file_id}.pkl"
+        results_path = os.path.join(app.config['UPLOAD_FOLDER'], results_file)
+        
+        with open(results_path, 'wb') as f:
+            pickle.dump(results, f)
+        
+        # Create file entry for workspace history (without storing full results in session)
         file_entry = {
             'id': file_id,
             'filename': filename,
@@ -91,7 +99,7 @@ def upload_file(workspace_name):
             'workspace': workspace_name,
             'timestamp': datetime.now().isoformat(),
             'upload_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'results': results,
+            'results_file': results_file,  # Store file path instead of data
             'output_file': output_file,
             'total_positions': total_positions,
             'mutated_positions': mutated_positions,
@@ -136,15 +144,16 @@ def download_file(filename):
     """Download the generated CSV file."""
     try:
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        logging.debug(f"Attempting to download file: {filepath}")
+        
         if os.path.exists(filepath):
             return send_file(filepath, as_attachment=True, download_name=filename)
         else:
-            flash('File not found', 'error')
-            return redirect(url_for('index'))
+            logging.error(f"File not found for download: {filepath}")
+            return jsonify({'error': 'File not found'}), 404
     except Exception as e:
         logging.error(f"Error downloading file: {str(e)}")
-        flash('Error downloading file', 'error')
-        return redirect(url_for('index'))
+        return jsonify({'error': 'Error downloading file'}), 500
 
 @app.route('/api/<workspace_name>/file/<file_id>')
 def get_file_data(workspace_name, file_id):
@@ -160,16 +169,33 @@ def get_file_data(workspace_name, file_id):
     file_data = None
     for entry in session[session_key]:
         if entry['id'] == file_id:
-            file_data = entry
+            file_data = entry.copy()
             break
     
     if not file_data:
-        return jsonify({'error': 'File not found'}), 404
+        return jsonify({'error': 'File not found in session'}), 404
     
-    return jsonify({
-        'success': True,
-        'file_data': file_data
-    })
+    # Load results from pickle file
+    try:
+        import pickle
+        results_path = os.path.join(app.config['UPLOAD_FOLDER'], file_data['results_file'])
+        
+        if not os.path.exists(results_path):
+            return jsonify({'error': 'Results file not found on disk'}), 404
+            
+        with open(results_path, 'rb') as f:
+            results = pickle.load(f)
+            
+        file_data['results'] = results
+        
+        return jsonify({
+            'success': True,
+            'file_data': file_data
+        })
+        
+    except Exception as e:
+        logging.error(f"Error loading results file: {str(e)}")
+        return jsonify({'error': 'Failed to load results data'}), 500
 
 @app.route('/api/<workspace_name>/history')
 def get_history(workspace_name):
@@ -188,8 +214,19 @@ def clear_history(workspace_name):
     """Clear workspace file history."""
     if workspace_name not in ['denv', 'chikv']:
         return jsonify({'error': 'Invalid workspace'}), 400
-        
+    
     session_key = f'{workspace_name}_history'
+    
+    # Clean up pickle files before clearing session
+    if session_key in session:
+        for entry in session[session_key]:
+            try:
+                results_path = os.path.join(app.config['UPLOAD_FOLDER'], entry.get('results_file', ''))
+                if os.path.exists(results_path):
+                    os.remove(results_path)
+            except Exception as e:
+                logging.error(f"Error cleaning up results file: {str(e)}")
+    
     session[session_key] = []
     session.modified = True
     return jsonify({'success': True, 'message': 'History cleared'})
