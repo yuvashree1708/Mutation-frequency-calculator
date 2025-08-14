@@ -1,0 +1,111 @@
+/* Custom styles for mutation analysis dashboard */
+
+.feature-icon {
+    padding: 1rem;
+}
+
+.mutation-repr {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+}
+
+/* Table enhancements */
+#resultsTable {
+    font-size: 0.9em;
+}
+
+#resultsTable tbody tr[data-color="Green"] {
+    border-left: 3px solid var(--bs-success);
+}
+
+#resultsTable tbody tr[data-color="Red"] {
+    border-left: 3px solid var(--bs-danger);
+}
+
+/* Loading state */
+.spinner-border {
+    width: 2rem;
+    height: 2rem;
+}
+
+/* File upload styling */
+.form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+/* Card enhancements */
+.card {
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.5rem;
+}
+
+.card-header {
+    background-color: var(--bs-gray-100);
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+/* Summary stats cards */
+.card-body h3 {
+    font-weight: 600;
+}
+
+/* DataTables dark theme adjustments */
+.dataTables_wrapper .dataTables_length select,
+.dataTables_wrapper .dataTables_filter input {
+    background-color: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+    color: var(--bs-body-color);
+}
+
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+    color: var(--bs-body-color);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    #resultsTable {
+        font-size: 0.8em;
+    }
+    
+    .d-flex {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .d-flex > div {
+        text-align: center;
+    }
+}
+
+/* Progress indicator */
+.progress-wrapper {
+    position: relative;
+    margin: 1rem 0;
+}
+
+/* Button states */
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Alert styling */
+.alert {
+    border-radius: 0.5rem;
+    border: none;
+}
+
+/* Code styling */
+code {
+    background-color: var(--bs-gray-100);
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-size: 0.9em;
+}

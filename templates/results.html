@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mutation Analysis Results</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container-fluid my-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2>
+                            <i class="fas fa-chart-line me-2 text-primary"></i>
+                            Mutation Analysis Results
+                        </h2>
+                        <p class="text-muted mb-0">
+                            Analysis for: <strong>{{ original_filename }}</strong> | 
+                            Total positions: <strong>{{ results|length }}</strong>
+                        </p>
+                    </div>
+                    <div>
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary me-2">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            New Analysis
+                        </a>
+                        <a href="{{ url_for('download_file', filename=output_file) }}" class="btn btn-success">
+                            <i class="fas fa-download me-1"></i>
+                            Download CSV
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title text-success">
+                            <i class="fas fa-check-circle"></i>
+                        </h5>
+                        <h3 class="mb-0" id="conservedCount">-</h3>
+                        <small class="text-muted">Conserved Positions</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title text-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </h5>
+                        <h3 class="mb-0" id="mutatedCount">-</h3>
+                        <small class="text-muted">Mutated Positions</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title text-warning">
+                            <i class="fas fa-question-circle"></i>
+                        </h5>
+                        <h3 class="mb-0" id="ambiguousCount">-</h3>
+                        <small class="text-muted">Low Confidence</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title text-info">
+                            <i class="fas fa-percentage"></i>
+                        </h5>
+                        <h3 class="mb-0" id="mutationRate">-</h3>
+                        <small class="text-muted">Mutation Rate</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Table -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-table me-2"></i>
+                    Detailed Results
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="resultsTable" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Position</th>
+                                <th>Reference</th>
+                                <th>Status</th>
+                                <th>Mutation Representation</th>
+                                <th>Confidence</th>
+                                <th>Raw Counts</th>
+                                <th>Frequencies (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in results %}
+                            <tr data-color="{{ result.Color }}" data-ambiguity="{{ result.Ambiguity }}">
+                                <td>{{ result.Position }}</td>
+                                <td><code>{{ result.Reference }}</code></td>
+                                <td>
+                                    {% if result.Color == 'Green' %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check me-1"></i>Conserved
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-exclamation me-1"></i>Mutated
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="mutation-repr">{{ result['Mutation Representation'] }}</span>
+                                </td>
+                                <td>
+                                    {% if result.Ambiguity == 'High-confidence' %}
+                                        <span class="badge bg-info">High</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Low</span>
+                                    {% endif %}
+                                </td>
+                                <td><small class="text-muted">{{ result.Counts }}</small></td>
+                                <td><small class="text-muted">{{ result['Frequencies (%)'] }}</small></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <h6 class="card-title">Legend</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <small>
+                            <span class="badge bg-success me-2">Conserved</span>
+                            No mutations detected at this position<br>
+                            <span class="badge bg-danger me-2">Mutated</span>
+                            Mutations present with frequency percentages
+                        </small>
+                    </div>
+                    <div class="col-md-6">
+                        <small>
+                            <span class="badge bg-info me-2">High Confidence</span>
+                            No ambiguous residues (X) detected<br>
+                            <span class="badge bg-warning me-2">Low Confidence</span>
+                            Contains ambiguous residues (X)
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        // Initialize DataTable and calculate stats
+        $(document).ready(function() {
+            initializeResultsTable();
+            calculateSummaryStats();
+        });
+    </script>
+</body>
+</html>
