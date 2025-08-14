@@ -119,6 +119,40 @@ body[data-workspace="chikv"] .history-item.active {
     font-weight: 500;
 }
 
+.file-actions {
+    margin-top: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.view-table-btn {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: none;
+    background: var(--bs-primary);
+    color: white;
+}
+
+.view-table-btn:hover {
+    background: var(--bs-primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.history-item.active .view-table-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.history-item.active .view-table-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
 /* Main Content Styles */
 .main-content {
     height: 100vh;

@@ -208,16 +208,27 @@ window.addEventListener('scroll', scrollHandler);
 
 // Passcode access functionality
 function accessWorkspace(workspace, passcode) {
+    const validKeywords = {
+        'denv': 'DENV',
+        'chikv': 'CHIKV'
+    };
+    
     if (!passcode || passcode.trim() === '') {
-        showPasscodeMessage('Please enter a keyword', 'error');
+        showPasscodeMessage('Please enter the workspace keyword', 'error');
         return;
     }
     
-    // Accept any non-empty keyword
-    showPasscodeMessage('Access granted! Redirecting...', 'success');
-    setTimeout(() => {
-        window.location.href = `/workspace/${workspace}?keyword=${encodeURIComponent(passcode.trim())}`;
-    }, 1000);
+    // Check if passcode matches the expected keyword for this workspace
+    if (passcode.trim().toUpperCase() === validKeywords[workspace]) {
+        showPasscodeMessage('Access granted! Redirecting...', 'success');
+        setTimeout(() => {
+            window.location.href = `/workspace/${workspace}?keyword=${encodeURIComponent(validKeywords[workspace])}`;
+        }, 1000);
+    } else {
+        showPasscodeMessage(`Please enter "${validKeywords[workspace]}" to access ${workspace.toUpperCase()} workspace`, 'error');
+        // Clear the input
+        document.getElementById(`${workspace}Passcode`).value = '';
+    }
 }
 
 // Show passcode message function

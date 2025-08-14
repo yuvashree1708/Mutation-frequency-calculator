@@ -174,10 +174,28 @@ class MutationWorkspace {
                     <span class="badge bg-danger">${file.mutation_count}</span>
                     <span class="badge bg-secondary">${file.total_positions}</span>
                 </div>
+                <div class="file-actions mt-2">
+                    <button class="btn btn-primary btn-sm view-table-btn" data-file-id="${file.id}">
+                        <i class="fas fa-table me-1"></i>View Mutation Freq Table
+                    </button>
+                </div>
             </div>
         `).join('');
         
         historyList.innerHTML = historyHtml;
+        
+        // Add event listeners for view table buttons
+        historyList.querySelectorAll('.view-table-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const fileId = button.getAttribute('data-file-id');
+                this.loadFileData(fileId);
+                
+                // Set the parent history item as active
+                const historyItem = button.closest('.history-item');
+                this.setActiveHistoryItem(historyItem);
+            });
+        });
     }
 
     loadFileData(fileId) {

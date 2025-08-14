@@ -7,15 +7,18 @@ This is an interactive bioinformatics web dashboard for analyzing mutation frequ
 Preferred communication style: Simple, everyday language.
 File upload preferences: Maximum file size support (3GB per file) for large genomic datasets.
 Workspace storage: Keyword-based shared file access system for team collaboration.
+Access control: Limited to "DENV" and "CHIKV" keywords only for workspace access.
+File viewing: Each file requires "View Mutation Freq Table" button for viewing detailed mutation data.
 
 # System Architecture
 
 ## Frontend Architecture
-- **Template Engine**: Single-page dashboard template (dashboard.html) with Bootstrap 5 dark theme
+- **Template Engine**: Single-page dashboard template (workspace.html) with Bootstrap 5 dark theme
 - **JavaScript**: ES6 class-based MutationDashboard for managing file history, AJAX uploads, and dynamic table rendering
 - **UI Layout**: Two-panel design with collapsible sidebar for file history and main content area for interactive tables
 - **Data Tables**: DataTables.js with advanced features (search, pagination, scrolling, position jumping)
 - **Styling**: Custom responsive CSS with sidebar navigation, mutation position highlighting, and toast notifications
+- **File Actions**: Each file in history includes "View Mutation Freq Table" button for direct access to mutation data
 
 ## Backend Architecture
 - **Web Framework**: Flask with RESTful API endpoints for AJAX communication and SQLAlchemy ORM
