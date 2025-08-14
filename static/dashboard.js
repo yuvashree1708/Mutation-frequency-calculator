@@ -101,33 +101,59 @@ class MutationWorkspace {
 
     renderHistory(history) {
         const historyList = document.getElementById('historyList');
-        const emptyHistory = document.getElementById('emptyHistory');
+        
+        // Clear existing content safely
+        historyList.textContent = '';
         
         if (history.length === 0) {
-            historyList.innerHTML = `
-                <div id="emptyHistory" class="text-center text-muted py-4">
-                    <i class="fas fa-history fa-2x mb-2 opacity-50"></i>
-                    <p class="small">No files uploaded yet</p>
-                </div>
-            `;
+            const emptyDiv = document.createElement('div');
+            emptyDiv.id = 'emptyHistory';
+            emptyDiv.className = 'text-center text-muted py-4';
+            
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-history fa-2x mb-2 opacity-50';
+            emptyDiv.appendChild(icon);
+            
+            const text = document.createElement('p');
+            text.className = 'small';
+            text.textContent = 'No files uploaded yet';
+            emptyDiv.appendChild(text);
+            
+            historyList.appendChild(emptyDiv);
             return;
         }
 
-        const historyHtml = history.map(file => `
-            <div class="history-item" data-file-id="${file.id}">
-                <div class="file-name">${file.original_filename}</div>
-                <div class="file-meta">
-                    <small class="text-muted">${file.upload_time}</small>
-                </div>
-                <div class="file-stats">
-                    <small>
-                        <span class="badge bg-danger">${file.mutation_count}</span> mutations
-                    </small>
-                </div>
-            </div>
-        `).join('');
-        
-        historyList.innerHTML = historyHtml;
+        history.forEach(file => {
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            historyItem.setAttribute('data-file-id', file.id);
+            
+            const fileName = document.createElement('div');
+            fileName.className = 'file-name';
+            fileName.textContent = file.original_filename;
+            historyItem.appendChild(fileName);
+            
+            const fileMeta = document.createElement('div');
+            fileMeta.className = 'file-meta';
+            const metaSmall = document.createElement('small');
+            metaSmall.className = 'text-muted';
+            metaSmall.textContent = file.upload_time;
+            fileMeta.appendChild(metaSmall);
+            historyItem.appendChild(fileMeta);
+            
+            const fileStats = document.createElement('div');
+            fileStats.className = 'file-stats';
+            const statsSmall = document.createElement('small');
+            const badge = document.createElement('span');
+            badge.className = 'badge bg-danger';
+            badge.textContent = file.mutation_count;
+            statsSmall.appendChild(badge);
+            statsSmall.appendChild(document.createTextNode(' mutations'));
+            fileStats.appendChild(statsSmall);
+            historyItem.appendChild(fileStats);
+            
+            historyList.appendChild(historyItem);
+        });
     }
 
     loadFileData(fileId) {
@@ -179,24 +205,40 @@ class MutationWorkspace {
         const mutatedContainer = document.getElementById('mutatedPositions');
         const lowConfContainer = document.getElementById('lowConfPositions');
 
+        // Clear existing content safely
+        mutatedContainer.textContent = '';
+        lowConfContainer.textContent = '';
+
         // Render mutated positions
         if (mutatedPositions.length > 0) {
-            const mutatedHtml = mutatedPositions.map(pos => 
-                `<span class="position-badge" title="Jump to position ${pos}">${pos}</span>`
-            ).join('');
-            mutatedContainer.innerHTML = mutatedHtml;
+            mutatedPositions.forEach(pos => {
+                const badge = document.createElement('span');
+                badge.className = 'position-badge';
+                badge.title = `Jump to position ${pos}`;
+                badge.textContent = pos;
+                mutatedContainer.appendChild(badge);
+            });
         } else {
-            mutatedContainer.innerHTML = '<span class="text-muted small">No mutations found</span>';
+            const noMutations = document.createElement('span');
+            noMutations.className = 'text-muted small';
+            noMutations.textContent = 'No mutations found';
+            mutatedContainer.appendChild(noMutations);
         }
 
         // Render low confidence positions
         if (lowConfPositions.length > 0) {
-            const lowConfHtml = lowConfPositions.map(pos => 
-                `<span class="position-badge low-conf" title="Jump to position ${pos}">${pos}</span>`
-            ).join('');
-            lowConfContainer.innerHTML = lowConfHtml;
+            lowConfPositions.forEach(pos => {
+                const badge = document.createElement('span');
+                badge.className = 'position-badge low-conf';
+                badge.title = `Jump to position ${pos}`;
+                badge.textContent = pos;
+                lowConfContainer.appendChild(badge);
+            });
         } else {
-            lowConfContainer.innerHTML = '<span class="text-muted small">All positions high confidence</span>';
+            const allHighConf = document.createElement('span');
+            allHighConf.className = 'text-muted small';
+            allHighConf.textContent = 'All positions high confidence';
+            lowConfContainer.appendChild(allHighConf);
         }
     }
 
@@ -209,32 +251,73 @@ class MutationWorkspace {
 
         const tableBody = document.querySelector('#dataTable tbody');
         
-        // Generate table rows
-        const rowsHtml = results.map(result => `
-            <tr data-color="${result.Color}" data-ambiguity="${result.Ambiguity}" data-position="${result.Position}">
-                <td>${result.Position}</td>
-                <td><code>${result.Reference}</code></td>
-                <td>
-                    ${result.Color === 'Green' ? 
-                        '<span class="badge bg-success"><i class="fas fa-check me-1"></i>Conserved</span>' :
-                        '<span class="badge bg-danger"><i class="fas fa-exclamation me-1"></i>Mutated</span>'
-                    }
-                </td>
-                <td>
-                    <span class="mutation-repr">${result['Mutation Representation']}</span>
-                </td>
-                <td>
-                    ${result.Ambiguity === 'High-confidence' ?
-                        '<span class="badge bg-info">High</span>' :
-                        '<span class="badge bg-warning">Low</span>'
-                    }
-                </td>
-                <td><small class="text-muted">${result.Counts}</small></td>
-                <td><small class="text-muted">${result['Frequencies (%)']}</small></td>
-            </tr>
-        `).join('');
+        // Clear existing content safely
+        tableBody.textContent = '';
         
-        tableBody.innerHTML = rowsHtml;
+        // Create table rows using safe DOM methods
+        results.forEach(result => {
+            const row = document.createElement('tr');
+            row.setAttribute('data-color', result.Color);
+            row.setAttribute('data-ambiguity', result.Ambiguity);
+            row.setAttribute('data-position', result.Position);
+            
+            // Position column
+            const posCell = document.createElement('td');
+            posCell.textContent = result.Position;
+            row.appendChild(posCell);
+            
+            // Reference column (with code styling)
+            const refCell = document.createElement('td');
+            const codeEl = document.createElement('code');
+            codeEl.textContent = result.Reference;
+            refCell.appendChild(codeEl);
+            row.appendChild(refCell);
+            
+            // Color/Status column
+            const colorCell = document.createElement('td');
+            const statusBadge = document.createElement('span');
+            const statusIcon = document.createElement('i');
+            statusIcon.className = result.Color === 'Green' ? 'fas fa-check me-1' : 'fas fa-exclamation me-1';
+            statusBadge.className = result.Color === 'Green' ? 'badge bg-success' : 'badge bg-danger';
+            statusBadge.appendChild(statusIcon);
+            statusBadge.appendChild(document.createTextNode(result.Color === 'Green' ? 'Conserved' : 'Mutated'));
+            colorCell.appendChild(statusBadge);
+            row.appendChild(colorCell);
+            
+            // Mutation representation column
+            const mutCell = document.createElement('td');
+            const mutSpan = document.createElement('span');
+            mutSpan.className = 'mutation-repr';
+            mutSpan.textContent = result['Mutation Representation'];
+            mutCell.appendChild(mutSpan);
+            row.appendChild(mutCell);
+            
+            // Ambiguity column
+            const ambCell = document.createElement('td');
+            const ambBadge = document.createElement('span');
+            ambBadge.className = result.Ambiguity === 'High-confidence' ? 'badge bg-info' : 'badge bg-warning';
+            ambBadge.textContent = result.Ambiguity === 'High-confidence' ? 'High' : 'Low';
+            ambCell.appendChild(ambBadge);
+            row.appendChild(ambCell);
+            
+            // Counts column
+            const countsCell = document.createElement('td');
+            const countsSmall = document.createElement('small');
+            countsSmall.className = 'text-muted';
+            countsSmall.textContent = result.Counts;
+            countsCell.appendChild(countsSmall);
+            row.appendChild(countsCell);
+            
+            // Frequencies column
+            const freqCell = document.createElement('td');
+            const freqSmall = document.createElement('small');
+            freqSmall.className = 'text-muted';
+            freqSmall.textContent = result['Frequencies (%)'];
+            freqCell.appendChild(freqSmall);
+            row.appendChild(freqCell);
+            
+            tableBody.appendChild(row);
+        });
 
         // Initialize DataTable
         this.dataTable = $('#dataTable').DataTable({
