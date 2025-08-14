@@ -1,9 +1,11 @@
 import os
 import logging
 from datetime import datetime
+import json
 from flask import Flask, render_template, request, redirect, url_for, flash, send_file, jsonify, session
 from werkzeug.utils import secure_filename
 from werkzeug.middleware.proxy_fix import ProxyFix
+from flask_sqlalchemy import SQLAlchemy
 from mutation_analyzer import analyze_mutations
 import tempfile
 import shutil
@@ -16,6 +18,25 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key-change-in-production")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
+# Database configuration
+database_url = os.environ.get("DATABASE_URL")
+if not database_url:
+    # Fallback for local development
+    database_url = "sqlite:///mutations.db"
+
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_recycle": 300,
+    "pool_pre_ping": True,
+}
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Import database models after app configuration
+from models import db, UploadedFile
+
+# Initialize the database with the app
+db.init_app(app)
+
 # Configuration
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'fasta', 'fa', 'txt', 'csv', 'fas', 'aln', 'seq', 'msa', 'phylip', 'phy', 'nex', 'nexus'}  # Support extensive alignment formats
@@ -26,6 +47,10 @@ app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
 
 # Ensure upload directory exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# Create database tables
+with app.app_context():
+    db.create_all()
 
 def allowed_file(filename):
     """Check if file extension is allowed."""
@@ -43,21 +68,15 @@ def workspace(workspace_name):
     if workspace_name not in ['denv', 'chikv']:
         return redirect(url_for('index'))
     
-    # Check if this is team access mode
-    team_access = request.args.get('team_access') == 'true'
-    
-    if team_access:
-        # For team access, load shared files from a global session key
-        shared_session_key = f'{workspace_name}_shared_files'
-        history = session.get(shared_session_key, [])
-        access_mode = 'team'
-    else:
-        # Regular user access - use individual session
-        session_key = f'{workspace_name}_history'
-        if session_key not in session:
-            session[session_key] = []
-        history = session.get(session_key, [])
-        access_mode = 'individual'
+    # Load files from database (always shared access now)
+    try:
+        uploaded_files = UploadedFile.get_workspace_files(workspace_name, limit=50)
+        history = [file.to_dict() for file in uploaded_files]
+        access_mode = 'shared'  # All files are now shared between users
+    except Exception as e:
+        logging.error(f"Error loading files from database: {str(e)}")
+        history = []
+        access_mode = 'shared'
     
     return render_template('workspace.html', 
                          workspace=workspace_name, 
@@ -104,45 +123,30 @@ def upload_file(workspace_name):
         with open(results_path, 'w') as f:
             json.dump(results, f)
         
-        # Create file entry for workspace history (without storing full results in session)
-        file_entry = {
-            'id': file_id,
-            'filename': filename,
-            'original_filename': file.filename,
-            'workspace': workspace_name,
-            'timestamp': datetime.now().isoformat(),
-            'upload_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'results_file': results_file,  # Store file path instead of data
-            'output_file': output_file,
-            'total_positions': total_positions,
-            'mutated_positions': mutated_positions,
-            'low_conf_positions': low_conf_positions,
-            'mutation_count': len(mutated_positions),
-            'conserved_count': total_positions - len(mutated_positions)
-        }
+        # Save file information to database for persistent storage
+        new_file = UploadedFile(
+            id=file_id,
+            filename=filename,
+            original_filename=file.filename,
+            workspace=workspace_name,
+            upload_time=datetime.utcnow(),
+            results_file=results_file,
+            output_file=output_file,
+            total_positions=total_positions,
+            mutation_count=len(mutated_positions),
+            conserved_count=total_positions - len(mutated_positions),
+            mutated_positions=json.dumps(mutated_positions),
+            low_conf_positions=json.dumps(low_conf_positions)
+        )
         
-        # Initialize workspace-specific session history
-        session_key = f'{workspace_name}_history'
-        if session_key not in session:
-            session[session_key] = []
-        
-        # Add to workspace history (newest first)
-        session[session_key].insert(0, file_entry)
-        
-        # Keep only last 25 files per workspace (expanded for 3GB storage capacity)
-        session[session_key] = session[session_key][:25]
-        
-        # Also store in shared session for team access
-        shared_session_key = f'{workspace_name}_shared_files'
-        if shared_session_key not in session:
-            session[shared_session_key] = []
-        
-        # Add to shared session (newest first)
-        session[shared_session_key].insert(0, file_entry)
-        
-        # Keep only last 25 files per workspace in shared session
-        session[shared_session_key] = session[shared_session_key][:25]
-        session.modified = True
+        try:
+            db.session.add(new_file)
+            db.session.commit()
+            logging.info(f"File saved to database: {filename} (ID: {file_id})")
+        except Exception as db_error:
+            logging.error(f"Error saving file to database: {str(db_error)}")
+            db.session.rollback()
+            raise Exception(f"Failed to save file information: {str(db_error)}")
         
         logging.debug(f"File processed: {filename}, mutations at positions: {mutated_positions[:10]}...")
         
@@ -188,26 +192,16 @@ def get_file_data(workspace_name, file_id):
     if workspace_name not in ['denv', 'chikv']:
         return jsonify({'error': 'Invalid workspace'}), 400
     
-    # Check if this is team access mode
-    team_access = request.args.get('team_access') == 'true'
-    
-    if team_access:
-        session_key = f'{workspace_name}_shared_files'
-    else:
-        session_key = f'{workspace_name}_history'
+    # Load file from database
+    try:
+        uploaded_file = UploadedFile.get_file_by_id(file_id)
+        if not uploaded_file or uploaded_file.workspace != workspace_name:
+            return jsonify({'error': 'File not found'}), 404
         
-    if session_key not in session:
-        return jsonify({'error': 'No files in history'}), 404
-    
-    # Find file in workspace history
-    file_data = None
-    for entry in session[session_key]:
-        if entry['id'] == file_id:
-            file_data = entry.copy()
-            break
-    
-    if not file_data:
-        return jsonify({'error': 'File not found in session'}), 404
+        file_data = uploaded_file.to_dict()
+    except Exception as e:
+        logging.error(f"Error loading file from database: {str(e)}")
+        return jsonify({'error': 'Database error'}), 500
     
     # Load results from file (supports both legacy pickle and new JSON formats)
     try:
@@ -232,13 +226,13 @@ def get_file_data(workspace_name, file_id):
             # Update file_data to point to new JSON file
             file_data['results_file'] = file_data['results_file'].replace('.pkl', '.json')
             
-            # Update session to reference JSON file
-            session_key = f'{workspace_name}_history'
-            for entry in session[session_key]:
-                if entry['id'] == file_id:
-                    entry['results_file'] = file_data['results_file']
-                    break
-            session.modified = True
+            # Update database to reference JSON file
+            try:
+                uploaded_file.results_file = file_data['results_file']
+                db.session.commit()
+            except Exception as db_error:
+                logging.error(f"Error updating database: {str(db_error)}")
+                db.session.rollback()
             
             # Clean up old pickle file
             try:
@@ -267,18 +261,21 @@ def get_history(workspace_name):
     if workspace_name not in ['denv', 'chikv']:
         return jsonify({'error': 'Invalid workspace'}), 400
     
-    # Check if this is team access mode
-    team_access = request.args.get('team_access') == 'true'
-    
-    if team_access:
-        session_key = f'{workspace_name}_shared_files'
-    else:
-        session_key = f'{workspace_name}_history'
-        
-    return jsonify({
-        'success': True,
-        'history': session.get(session_key, [])
-    })
+    # Load files from database (always shared now)
+    try:
+        uploaded_files = UploadedFile.get_workspace_files(workspace_name, limit=50)
+        history = [file.to_dict() for file in uploaded_files]
+        return jsonify({
+            'success': True,
+            'history': history
+        })
+    except Exception as e:
+        logging.error(f"Error loading history from database: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Database error',
+            'history': []
+        })
 
 @app.route('/api/<workspace_name>/clear-history', methods=['POST'])
 def clear_history(workspace_name):
@@ -286,21 +283,37 @@ def clear_history(workspace_name):
     if workspace_name not in ['denv', 'chikv']:
         return jsonify({'error': 'Invalid workspace'}), 400
     
-    session_key = f'{workspace_name}_history'
-    
-    # Clean up results files before clearing session
-    if session_key in session:
-        for entry in session[session_key]:
+    try:
+        # Get all files for the workspace
+        files_to_delete = UploadedFile.get_workspace_files(workspace_name, limit=1000)
+        
+        # Clean up files from disk
+        for uploaded_file in files_to_delete:
             try:
-                results_path = os.path.join(app.config['UPLOAD_FOLDER'], entry.get('results_file', ''))
+                # Remove results file
+                results_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.results_file)
                 if os.path.exists(results_path):
                     os.remove(results_path)
+                
+                # Remove output file if exists
+                if uploaded_file.output_file:
+                    output_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.output_file)
+                    if os.path.exists(output_path):
+                        os.remove(output_path)
+                        
             except Exception as e:
-                logging.error(f"Error cleaning up results file: {str(e)}")
-    
-    session[session_key] = []
-    session.modified = True
-    return jsonify({'success': True, 'message': 'History cleared'})
+                logging.error(f"Error cleaning up files for {uploaded_file.id}: {str(e)}")
+        
+        # Delete from database
+        UploadedFile.query.filter_by(workspace=workspace_name).delete()
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': f'History cleared for {workspace_name} workspace'})
+        
+    except Exception as e:
+        logging.error(f"Error clearing history: {str(e)}")
+        db.session.rollback()
+        return jsonify({'error': 'Failed to clear history'}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

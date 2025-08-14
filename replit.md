@@ -18,11 +18,12 @@ Workspace storage: Expanded capacity to store up to 25 files per workspace (DENV
 - **Styling**: Custom responsive CSS with sidebar navigation, mutation position highlighting, and toast notifications
 
 ## Backend Architecture
-- **Web Framework**: Flask with RESTful API endpoints for AJAX communication
+- **Web Framework**: Flask with RESTful API endpoints for AJAX communication and SQLAlchemy ORM
+- **Database**: PostgreSQL with Flask-SQLAlchemy for persistent file storage and metadata management
 - **File Processing**: AJAX-based file upload with unique file ID generation and temporary storage
-- **Session Management**: Flask sessions storing file history with metadata (filename, timestamps, results, mutation positions)
+- **Data Persistence**: Database models for UploadedFile with comprehensive metadata and analysis results
 - **API Endpoints**: /api/file/<id>, /api/history, /api/clear-history for dynamic data management
-- **Logging**: Python logging module with detailed debugging for file processing and session management
+- **Logging**: Python logging module with detailed debugging for file processing and database operations
 
 ## Data Processing Engine
 - **Bioinformatics Library**: BioPython for sequence alignment parsing and analysis
@@ -31,10 +32,11 @@ Workspace storage: Expanded capacity to store up to 25 files per workspace (DENV
 - **Output Generation**: CSV export functionality with detailed mutation statistics
 
 ## File Storage Strategy
-- **Session-Based History**: File results stored in Flask sessions with 25-file limit (newest first) supporting up to 3GB per file
-- **Temporary Processing**: Unique file ID system for secure processing and immediate cleanup
-- **In-Memory Storage**: Complete analysis results stored in session for instant retrieval without re-processing
-- **CSV Export**: Generated CSV files available through download endpoints tied to session data
+- **Database-Persistent Storage**: PostgreSQL database stores file metadata and analysis results with unlimited history
+- **Shared File Access**: All uploaded files are permanently available to all users across sessions
+- **Temporary Processing**: Unique file ID system for secure processing and immediate cleanup of original uploads
+- **JSON Results Storage**: Complete analysis results stored as JSON files on disk, referenced by database
+- **CSV Export**: Generated CSV files available through download endpoints tied to database records
 - **Large Dataset Support**: Enhanced capacity for comprehensive genomic analysis projects with multiple large files
 
 ## Security Features
@@ -45,7 +47,9 @@ Workspace storage: Expanded capacity to store up to 25 files per workspace (DENV
 # External Dependencies
 
 ## Core Libraries
-- **Flask**: Web application framework
+- **Flask**: Web application framework with SQLAlchemy ORM integration
+- **Flask-SQLAlchemy**: Database ORM for PostgreSQL integration
+- **PostgreSQL**: Production database for persistent file storage and metadata
 - **BioPython**: Sequence analysis and alignment file parsing
 - **Werkzeug**: WSGI utilities and security features
 
