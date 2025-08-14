@@ -86,40 +86,61 @@ function initializeResultsTable() {
 }
 
 function calculateSummaryStats() {
-    const rows = document.querySelectorAll('#resultsTable tbody tr');
-    let conservedCount = 0;
-    let mutatedCount = 0;
-    let ambiguousCount = 0;
-    
-    rows.forEach(row => {
-        const color = row.getAttribute('data-color');
-        const ambiguity = row.getAttribute('data-ambiguity');
+    // Wait a bit to ensure DataTables has finished initializing
+    setTimeout(() => {
+        const rows = document.querySelectorAll('#resultsTable tbody tr');
+        let conservedCount = 0;
+        let mutatedCount = 0;
+        let ambiguousCount = 0;
         
-        if (color === 'Green') {
-            conservedCount++;
-        } else if (color === 'Red') {
-            mutatedCount++;
-        }
+        console.log(`Found ${rows.length} rows to analyze`);
         
-        if (ambiguity === 'Low-confidence') {
-            ambiguousCount++;
+        rows.forEach((row, index) => {
+            const color = row.getAttribute('data-color');
+            const ambiguity = row.getAttribute('data-ambiguity');
+            
+            console.log(`Row ${index}: color=${color}, ambiguity=${ambiguity}`);
+            
+            if (color === 'Green') {
+                conservedCount++;
+            } else if (color === 'Red') {
+                mutatedCount++;
+            }
+            
+            if (ambiguity === 'Low-confidence') {
+                ambiguousCount++;
+            }
+        });
+        
+        const totalPositions = rows.length;
+        const mutationRate = totalPositions > 0 ? 
+            Math.round((mutatedCount / totalPositions) * 100) : 0;
+        
+        console.log(`Stats: total=${totalPositions}, conserved=${conservedCount}, mutated=${mutatedCount}, lowConf=${ambiguousCount}, rate=${mutationRate}%`);
+        
+        // Update summary cards
+        const conservedEl = document.getElementById('conservedCount');
+        const mutatedEl = document.getElementById('mutatedCount');
+        const ambiguousEl = document.getElementById('ambiguousCount');
+        const mutationRateEl = document.getElementById('mutationRate');
+        
+        if (conservedEl) {
+            conservedEl.textContent = conservedCount;
+            console.log('Updated conserved count');
         }
-    });
-    
-    const totalPositions = rows.length;
-    const mutationRate = totalPositions > 0 ? 
-        Math.round((mutatedCount / totalPositions) * 100) : 0;
-    
-    // Update summary cards
-    const conservedEl = document.getElementById('conservedCount');
-    const mutatedEl = document.getElementById('mutatedCount');
-    const ambiguousEl = document.getElementById('ambiguousCount');
-    const mutationRateEl = document.getElementById('mutationRate');
-    
-    if (conservedEl) conservedEl.textContent = conservedCount;
-    if (mutatedEl) mutatedEl.textContent = mutatedCount;
-    if (ambiguousEl) ambiguousEl.textContent = ambiguousCount;
-    if (mutationRateEl) mutationRateEl.textContent = mutationRate + '%';
+        if (mutatedEl) {
+            mutatedEl.textContent = mutatedCount;
+            console.log('Updated mutated count');
+        }
+        if (ambiguousEl) {
+            ambiguousEl.textContent = ambiguousCount;
+            console.log('Updated ambiguous count');
+        }
+        if (mutationRateEl) {
+            mutationRateEl.textContent = mutationRate + '%';
+            console.log('Updated mutation rate');
+        }
+    }, 500); // Wait 500ms for DataTables to initialize
 }
 
 // Utility functions

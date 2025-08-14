@@ -60,13 +60,31 @@ def upload_file():
         # Process the file
         results, output_file = analyze_mutations(filepath)
         
+        # Calculate summary statistics
+        total_positions = len(results)
+        conserved_count = sum(1 for r in results if r['Color'] == 'Green')
+        mutated_count = sum(1 for r in results if r['Color'] == 'Red') 
+        low_conf_count = sum(1 for r in results if r['Ambiguity'] == 'Low-confidence')
+        mutation_rate = round((mutated_count / total_positions) * 100) if total_positions > 0 else 0
+        
+        stats = {
+            'total_positions': total_positions,
+            'conserved_count': conserved_count,
+            'mutated_count': mutated_count,
+            'low_conf_count': low_conf_count,
+            'mutation_rate': mutation_rate
+        }
+        
+        logging.debug(f"Summary stats: {stats}")
+        
         # Clean up uploaded file
         os.remove(filepath)
         
         return render_template('results.html', 
                              results=results, 
                              output_file=output_file,
-                             original_filename=filename)
+                             original_filename=filename,
+                             stats=stats)
         
     except Exception as e:
         logging.error(f"Error processing file: {str(e)}")

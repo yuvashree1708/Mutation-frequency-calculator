@@ -47,7 +47,7 @@
                         <h5 class="card-title text-success">
                             <i class="fas fa-check-circle"></i>
                         </h5>
-                        <h3 class="mb-0" id="conservedCount">-</h3>
+                        <h3 class="mb-0" id="conservedCount">{{ stats.conserved_count }}</h3>
                         <small class="text-muted">Conserved Positions</small>
                     </div>
                 </div>
@@ -58,7 +58,7 @@
                         <h5 class="card-title text-danger">
                             <i class="fas fa-exclamation-triangle"></i>
                         </h5>
-                        <h3 class="mb-0" id="mutatedCount">-</h3>
+                        <h3 class="mb-0" id="mutatedCount">{{ stats.mutated_count }}</h3>
                         <small class="text-muted">Mutated Positions</small>
                     </div>
                 </div>
@@ -69,7 +69,7 @@
                         <h5 class="card-title text-warning">
                             <i class="fas fa-question-circle"></i>
                         </h5>
-                        <h3 class="mb-0" id="ambiguousCount">-</h3>
+                        <h3 class="mb-0" id="ambiguousCount">{{ stats.low_conf_count }}</h3>
                         <small class="text-muted">Low Confidence</small>
                     </div>
                 </div>
@@ -80,7 +80,7 @@
                         <h5 class="card-title text-info">
                             <i class="fas fa-percentage"></i>
                         </h5>
-                        <h3 class="mb-0" id="mutationRate">-</h3>
+                        <h3 class="mb-0" id="mutationRate">{{ stats.mutation_rate }}%</h3>
                         <small class="text-muted">Mutation Rate</small>
                     </div>
                 </div>
@@ -179,8 +179,12 @@
     <script>
         // Initialize DataTable and calculate stats
         $(document).ready(function() {
+            console.log('DOM ready, initializing...');
             initializeResultsTable();
             calculateSummaryStats();
+            
+            // Also calculate stats after DataTable is fully initialized
+            setTimeout(calculateSummaryStats, 1000);
         });
     </script>
 </body>
