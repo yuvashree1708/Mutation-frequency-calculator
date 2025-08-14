@@ -68,26 +68,44 @@ def workspace(workspace_name):
     if workspace_name not in ['denv', 'chikv']:
         return redirect(url_for('index'))
     
-    # Load files from database (always shared access now)
+    # Get keyword from URL parameter or session
+    keyword = request.args.get('keyword') or session.get(f'{workspace_name}_keyword')
+    
+    if not keyword:
+        # Redirect to index with message to enter keyword
+        flash('Please enter a keyword to access the workspace', 'info')
+        return redirect(url_for('index'))
+    
+    # Store keyword in session for this workspace
+    session[f'{workspace_name}_keyword'] = keyword
+    session.permanent = True
+    
+    # Load files from database for this keyword
     try:
-        uploaded_files = UploadedFile.get_workspace_files(workspace_name, limit=50)
+        uploaded_files = UploadedFile.get_keyword_files(workspace_name, keyword, limit=50)
         history = [file.to_dict() for file in uploaded_files]
-        access_mode = 'shared'  # All files are now shared between users
+        access_mode = 'keyword-shared'
     except Exception as e:
         logging.error(f"Error loading files from database: {str(e)}")
         history = []
-        access_mode = 'shared'
+        access_mode = 'keyword-shared'
     
     return render_template('workspace.html', 
                          workspace=workspace_name, 
                          history=history,
-                         access_mode=access_mode)
+                         access_mode=access_mode,
+                         keyword=keyword)
 
 @app.route('/upload/<workspace_name>', methods=['POST'])
 def upload_file(workspace_name):
     """Handle file upload and process mutation analysis via AJAX."""
     if workspace_name not in ['denv', 'chikv']:
         return jsonify({'error': 'Invalid workspace'}), 400
+    
+    # Get keyword from session
+    keyword = session.get(f'{workspace_name}_keyword')
+    if not keyword:
+        return jsonify({'error': 'No keyword found. Please refresh the page and enter a keyword.'}), 400
         
     if 'file' not in request.files:
         return jsonify({'error': 'No file selected'}), 400
@@ -129,6 +147,7 @@ def upload_file(workspace_name):
             filename=filename,
             original_filename=file.filename,
             workspace=workspace_name,
+            keyword=keyword,
             upload_time=datetime.utcnow(),
             results_file=results_file,
             output_file=output_file,
@@ -192,11 +211,16 @@ def get_file_data(workspace_name, file_id):
     if workspace_name not in ['denv', 'chikv']:
         return jsonify({'error': 'Invalid workspace'}), 400
     
-    # Load file from database
+    # Get keyword from session
+    keyword = session.get(f'{workspace_name}_keyword')
+    if not keyword:
+        return jsonify({'error': 'No keyword found. Please refresh the page.'}), 400
+    
+    # Load file from database with keyword check
     try:
-        uploaded_file = UploadedFile.get_file_by_id(file_id)
+        uploaded_file = UploadedFile.get_file_by_id(file_id, keyword=keyword)
         if not uploaded_file or uploaded_file.workspace != workspace_name:
-            return jsonify({'error': 'File not found'}), 404
+            return jsonify({'error': 'File not found or access denied'}), 404
         
         file_data = uploaded_file.to_dict()
     except Exception as e:
@@ -261,9 +285,14 @@ def get_history(workspace_name):
     if workspace_name not in ['denv', 'chikv']:
         return jsonify({'error': 'Invalid workspace'}), 400
     
-    # Load files from database (always shared now)
+    # Get keyword from session
+    keyword = session.get(f'{workspace_name}_keyword')
+    if not keyword:
+        return jsonify({'error': 'No keyword found. Please refresh the page.'}), 400
+    
+    # Load files from database for this keyword
     try:
-        uploaded_files = UploadedFile.get_workspace_files(workspace_name, limit=50)
+        uploaded_files = UploadedFile.get_keyword_files(workspace_name, keyword, limit=50)
         history = [file.to_dict() for file in uploaded_files]
         return jsonify({
             'success': True,
@@ -279,13 +308,18 @@ def get_history(workspace_name):
 
 @app.route('/api/<workspace_name>/clear-history', methods=['POST'])
 def clear_history(workspace_name):
-    """Clear workspace file history."""
+    """Clear workspace file history for the current keyword."""
     if workspace_name not in ['denv', 'chikv']:
         return jsonify({'error': 'Invalid workspace'}), 400
     
+    # Get keyword from session
+    keyword = session.get(f'{workspace_name}_keyword')
+    if not keyword:
+        return jsonify({'error': 'No keyword found. Please refresh the page.'}), 400
+    
     try:
-        # Get all files for the workspace
-        files_to_delete = UploadedFile.get_workspace_files(workspace_name, limit=1000)
+        # Get all files for the workspace and keyword
+        files_to_delete = UploadedFile.get_keyword_files(workspace_name, keyword, limit=1000)
         
         # Clean up files from disk
         for uploaded_file in files_to_delete:
@@ -304,11 +338,11 @@ def clear_history(workspace_name):
             except Exception as e:
                 logging.error(f"Error cleaning up files for {uploaded_file.id}: {str(e)}")
         
-        # Delete from database
-        UploadedFile.query.filter_by(workspace=workspace_name).delete()
+        # Delete from database (only files with this keyword)
+        UploadedFile.query.filter_by(workspace=workspace_name, keyword=keyword).delete()
         db.session.commit()
         
-        return jsonify({'success': True, 'message': f'History cleared for {workspace_name} workspace'})
+        return jsonify({'success': True, 'message': f'History cleared for {workspace_name} workspace with keyword "{keyword}"'})
         
     except Exception as e:
         logging.error(f"Error clearing history: {str(e)}")

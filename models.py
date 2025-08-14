@@ -16,6 +16,7 @@ class UploadedFile(db.Model):
     filename = db.Column(db.String(255), nullable=False)
     original_filename = db.Column(db.String(255), nullable=False)
     workspace = db.Column(db.String(10), nullable=False)  # 'denv' or 'chikv'
+    keyword = db.Column(db.String(100), nullable=False)  # keyword for shared access
     upload_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     results_file = db.Column(db.String(255), nullable=False)  # path to JSON results file
     output_file = db.Column(db.String(255), nullable=True)   # path to CSV output file
@@ -47,13 +48,24 @@ class UploadedFile(db.Model):
         }
     
     @classmethod
-    def get_workspace_files(cls, workspace, limit=25):
-        """Get files for a specific workspace, ordered by most recent first."""
-        return cls.query.filter_by(workspace=workspace)\
-                       .order_by(cls.upload_time.desc())\
-                       .limit(limit).all()
+    def get_workspace_files(cls, workspace, keyword=None, limit=25):
+        """Get files for a specific workspace and keyword, ordered by most recent first."""
+        query = cls.query.filter_by(workspace=workspace)
+        if keyword:
+            query = query.filter_by(keyword=keyword)
+        return query.order_by(cls.upload_time.desc()).limit(limit).all()
     
     @classmethod
-    def get_file_by_id(cls, file_id):
-        """Get a file by its ID."""
-        return cls.query.filter_by(id=file_id).first()
+    def get_file_by_id(cls, file_id, keyword=None):
+        """Get a file by its ID, optionally filtered by keyword."""
+        query = cls.query.filter_by(id=file_id)
+        if keyword:
+            query = query.filter_by(keyword=keyword)
+        return query.first()
+    
+    @classmethod
+    def get_keyword_files(cls, workspace, keyword, limit=25):
+        """Get files for a specific workspace and keyword combination."""
+        return cls.query.filter_by(workspace=workspace, keyword=keyword)\
+                       .order_by(cls.upload_time.desc())\
+                       .limit(limit).all()

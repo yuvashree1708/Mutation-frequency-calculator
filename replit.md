@@ -6,7 +6,7 @@ This is an interactive bioinformatics web dashboard for analyzing mutation frequ
 
 Preferred communication style: Simple, everyday language.
 File upload preferences: Maximum file size support (3GB per file) for large genomic datasets.
-Workspace storage: Expanded capacity to store up to 25 files per workspace (DENV/CHIKV).
+Workspace storage: Keyword-based shared file access system for team collaboration.
 
 # System Architecture
 
@@ -32,8 +32,9 @@ Workspace storage: Expanded capacity to store up to 25 files per workspace (DENV
 - **Output Generation**: CSV export functionality with detailed mutation statistics
 
 ## File Storage Strategy
-- **Database-Persistent Storage**: PostgreSQL database stores file metadata and analysis results with unlimited history
-- **Shared File Access**: All uploaded files are permanently available to all users across sessions
+- **Database-Persistent Storage**: PostgreSQL database stores file metadata and analysis results with keyword-based access control
+- **Keyword-Based Sharing**: Files uploaded by users with the same keyword are shared within that group
+- **Session Isolation**: Different keywords create separate file spaces for team collaboration
 - **Temporary Processing**: Unique file ID system for secure processing and immediate cleanup of original uploads
 - **JSON Results Storage**: Complete analysis results stored as JSON files on disk, referenced by database
 - **CSV Export**: Generated CSV files available through download endpoints tied to database records
