@@ -54,10 +54,11 @@ Device accessibility: Fully responsive design for mobile phones, tablets, laptop
 
 ## Core Libraries
 - **Flask**: Web application framework with SQLAlchemy ORM integration
-- **Flask-SQLAlchemy**: Database ORM for PostgreSQL integration
-- **PostgreSQL**: Production database for persistent file storage and metadata
+- **Flask-SQLAlchemy**: Database ORM for PostgreSQL integration with enhanced connection pooling
+- **PostgreSQL**: Production database with connection pooling and retry mechanisms for deployment stability
 - **BioPython**: Sequence analysis and alignment file parsing
 - **Werkzeug**: WSGI utilities and security features
+- **Gunicorn**: Production WSGI server with optimized worker configuration for large file handling
 
 ## Frontend Dependencies
 - **Bootstrap 5**: UI framework with dark theme variant and toast notification system

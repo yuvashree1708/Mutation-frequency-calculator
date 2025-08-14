@@ -269,30 +269,54 @@ class MutationWorkspace {
         const workspace = window.WORKSPACE || this.workspace;
         console.log('Loading file data for:', fileId, 'workspace:', workspace);
         
-        fetch(`/api/${workspace}/file/${fileId}`)
-        .then(response => {
-            if (response.ok) {
+        // Enhanced error handling with retry mechanism for deployment stability
+        const loadWithRetry = (attempt = 1) => {
+            fetch(`/api/${workspace}/file/${fileId}`, {
+                method: 'GET',
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status >= 500) {
+                        throw new Error(`Server Error ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json().then(err => Promise.reject(err));
+                }
                 return response.json();
-            } else {
-                return response.json().then(err => Promise.reject(err));
-            }
-        })
-        .then(data => {
-            if (data.success) {
-                this.currentFileId = fileId;
-                this.renderFileData(data.file_data);
-                this.hideLoadingSpinner();
-            } else {
-                this.showToast('Error', data.error, 'danger');
-                this.hideLoadingSpinner();
-            }
-        })
-        .catch(error => {
-            const errorMessage = error.error || error.message || 'Failed to load file data';
-            this.showToast('File Error', errorMessage, 'danger');
-            this.hideLoadingSpinner();
-            console.error('Load file error:', error);
-        });
+            })
+            .then(data => {
+                if (data.success && data.file_data) {
+                    this.currentFileId = fileId;
+                    this.renderFileData(data.file_data);
+                    this.hideLoadingSpinner();
+                } else {
+                    const errorMsg = data.error || 'Failed to load file data';
+                    this.showToast('Error', errorMsg, 'danger');
+                    this.hideLoadingSpinner();
+                }
+            })
+            .catch(error => {
+                console.error(`Load file attempt ${attempt} failed:`, error);
+                
+                // Retry on server errors or network issues
+                if (attempt < 3 && (error.message.includes('Server Error') || error.message.includes('Failed to fetch'))) {
+                    setTimeout(() => {
+                        console.log(`Retrying file load, attempt ${attempt + 1}`);
+                        loadWithRetry(attempt + 1);
+                    }, 1000 * attempt); // Exponential backoff
+                } else {
+                    const errorMessage = error.error || error.message || 'Failed to load file data';
+                    this.showToast('File Error', `${errorMessage}${attempt > 1 ? ' (after retries)' : ''}`, 'danger');
+                    this.hideLoadingSpinner();
+                    console.error('Final load error:', error);
+                }
+            });
+        };
+        
+        loadWithRetry();
     }
 
     renderFileData(fileData) {

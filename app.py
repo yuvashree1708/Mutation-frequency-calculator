@@ -28,6 +28,9 @@ app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
     "pool_pre_ping": True,
+    "pool_timeout": 20,
+    "max_overflow": 0,
+    "connect_args": {"connect_timeout": 60}
 }
 # Increase max content length for large file uploads (3GB)
 app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024 * 1024  # 3GB
@@ -50,9 +53,17 @@ app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
 # Ensure upload directory exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Create database tables
+# Create database tables and add connection health check
 with app.app_context():
-    db.create_all()
+    try:
+        db.create_all()
+        # Test connection
+        db.session.execute("SELECT 1")
+        db.session.commit()
+        logging.info("Database connection established successfully")
+    except Exception as db_error:
+        logging.error(f"Database initialization failed: {str(db_error)}")
+        # Continue anyway for debugging purposes
 
 def allowed_file(filename):
     """Check if file extension is allowed."""
@@ -233,8 +244,11 @@ def download_file(filename):
 
 @app.route('/api/<workspace_name>/file/<file_id>')
 def get_file_data(workspace_name, file_id):
-    """Get file data for display in the main table."""
+    """Get file data for display in the main table with enhanced error handling."""
+    logging.info(f"Request for file data: workspace={workspace_name}, file_id={file_id}")
+    
     if workspace_name not in ['denv', 'chikv']:
+        logging.error(f"Invalid workspace requested: {workspace_name}")
         return jsonify({'error': 'Invalid workspace'}), 400
     
     # Get keyword from session or set default
@@ -242,18 +256,49 @@ def get_file_data(workspace_name, file_id):
     if not keyword:
         keyword = 'DENV' if workspace_name == 'denv' else 'CHIKV'
         session[f'{workspace_name}_keyword'] = keyword
+        session.permanent = True
         logging.info(f"Set default keyword for {workspace_name}: {keyword}")
+    
+    # Test database connectivity first
+    try:
+        db.session.execute("SELECT 1")
+        db.session.commit()
+    except Exception as db_test_error:
+        logging.error(f"Database connectivity test failed: {str(db_test_error)}")
+        try:
+            db.session.rollback()
+            db.engine.dispose()  # Force reconnection
+        except:
+            pass
     
     # Load file from database with keyword check
     try:
         uploaded_file = UploadedFile.get_file_by_id(file_id, keyword=keyword)
-        if not uploaded_file or uploaded_file.workspace != workspace_name:
-            return jsonify({'error': 'File not found or access denied'}), 404
+        if not uploaded_file:
+            logging.error(f"File not found in database: file_id={file_id}, keyword={keyword}")
+            return jsonify({'error': 'File not found'}), 404
+            
+        if uploaded_file.workspace != workspace_name:
+            logging.error(f"Workspace mismatch: expected={workspace_name}, found={uploaded_file.workspace}")
+            return jsonify({'error': 'Access denied - workspace mismatch'}), 403
         
         file_data = uploaded_file.to_dict()
+        logging.info(f"File data loaded successfully: {file_data['original_filename']}")
     except Exception as e:
-        logging.error(f"Error loading file from database: {str(e)}")
-        return jsonify({'error': 'Database error'}), 500
+        logging.error(f"Database error loading file: {str(e)}")
+        # Try to reconnect and retry once
+        try:
+            db.session.rollback()
+            db.engine.dispose()
+            uploaded_file = UploadedFile.get_file_by_id(file_id, keyword=keyword)
+            if uploaded_file and uploaded_file.workspace == workspace_name:
+                file_data = uploaded_file.to_dict()
+                logging.info(f"File data loaded on retry: {file_data['original_filename']}")
+            else:
+                return jsonify({'error': 'File not found after retry'}), 404
+        except Exception as retry_error:
+            logging.error(f"Database retry failed: {str(retry_error)}")
+            return jsonify({'error': f'Database connection failed: {str(e)}'}), 500
     
     # Load results from file (supports both legacy pickle and new JSON formats)
     try:
