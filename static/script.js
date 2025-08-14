@@ -65,8 +65,8 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeResultsTable() {
     if (typeof $ !== 'undefined' && $('#resultsTable').length) {
         $('#resultsTable').DataTable({
-            pageLength: 25,
-            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+            pageLength: 50,
+            lengthMenu: [[50, 25, 100, -1], [50, 25, 100, "All"]],
             order: [[0, 'asc']], // Sort by position
             columnDefs: [
                 {
