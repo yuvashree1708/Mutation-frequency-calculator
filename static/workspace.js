@@ -297,11 +297,16 @@ class MutationWorkspace {
         
         tableBody.innerHTML = rowsHtml;
 
-        // Initialize DataTable with enhanced options
+        // Initialize DataTable with single scroll view and enhanced readability
         this.dataTable = $('#dataTable').DataTable({
-            pageLength: 50,
-            lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+            pageLength: -1, // Show all rows (no pagination)
+            lengthMenu: [[-1], ["All"]], // Only "All" option
+            paging: false, // Disable pagination completely
+            scrollY: '65vh', // Vertical scrolling
+            scrollX: true, // Horizontal scrolling if needed
+            scrollCollapse: true,
             order: [[0, 'asc']], // Sort by position
+            dom: '<"row"<"col-sm-12"f>>rt', // Only show search and table (no pagination controls)
             columnDefs: [
                 {
                     targets: [5, 6], // Raw counts and frequencies columns
@@ -318,23 +323,13 @@ class MutationWorkspace {
             ],
             language: {
                 search: "Search positions and mutations:",
-                lengthMenu: "Show _MENU_ positions per page",
-                info: "Showing _START_ to _END_ of _TOTAL_ positions",
-                infoEmpty: "No positions found",
-                infoFiltered: "(filtered from _MAX_ total positions)",
-                paginate: {
-                    first: "First",
-                    last: "Last",
-                    next: "Next",
-                    previous: "Prev"
-                }
+                info: "", // Remove info display
+                infoEmpty: "",
+                infoFiltered: ""
             },
-            dom: '<"row mb-3"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>><"row"<"col-sm-12"t>><"row mt-3"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
-            scrollY: 'calc(100vh - 400px)',
-            scrollCollapse: true,
-            responsive: true,
+            responsive: false,
             autoWidth: false,
-            processing: true
+            processing: false
         });
 
         // Add custom styling for DataTables elements
