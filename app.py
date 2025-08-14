@@ -85,12 +85,12 @@ def upload_file(workspace_name):
         low_conf_positions = [r['Position'] for r in results if r['Ambiguity'] == 'Low-confidence']
         
         # Store results in a temporary file to avoid large sessions
-        import pickle
-        results_file = f"results_{file_id}.pkl"
+        import json
+        results_file = f"results_{file_id}.json"
         results_path = os.path.join(app.config['UPLOAD_FOLDER'], results_file)
         
-        with open(results_path, 'wb') as f:
-            pickle.dump(results, f)
+        with open(results_path, 'w') as f:
+            json.dump(results, f)
         
         # Create file entry for workspace history (without storing full results in session)
         file_entry = {
@@ -179,16 +179,16 @@ def get_file_data(workspace_name, file_id):
     if not file_data:
         return jsonify({'error': 'File not found in session'}), 404
     
-    # Load results from pickle file
+    # Load results from JSON file
     try:
-        import pickle
+        import json
         results_path = os.path.join(app.config['UPLOAD_FOLDER'], file_data['results_file'])
         
         if not os.path.exists(results_path):
             return jsonify({'error': 'Results file not found on disk'}), 404
             
-        with open(results_path, 'rb') as f:
-            results = pickle.load(f)
+        with open(results_path, 'r') as f:
+            results = json.load(f)
             
         file_data['results'] = results
         
@@ -221,7 +221,7 @@ def clear_history(workspace_name):
     
     session_key = f'{workspace_name}_history'
     
-    # Clean up pickle files before clearing session
+    # Clean up results files before clearing session
     if session_key in session:
         for entry in session[session_key]:
             try:
