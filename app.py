@@ -127,16 +127,13 @@ def upload_file(workspace_name):
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], f"{file_id}_{filename}")
         file.save(filepath)
         
-        # Process the file with progress feedback
-        logging.info(f"Starting mutation analysis for file: {filename}")
+        # Process the file
         results, output_file = analyze_mutations(filepath)
         
         # Calculate summary statistics and mutation positions
         total_positions = len(results)
         mutated_positions = [r['Position'] for r in results if r['Color'] == 'Red']
         low_conf_positions = [r['Position'] for r in results if r['Ambiguity'] == 'Low-confidence']
-        
-        logging.info(f"Analysis complete: {total_positions} positions, {len(mutated_positions)} mutations")
         
         # Store results in a temporary file to avoid large sessions
         import json
@@ -180,13 +177,7 @@ def upload_file(workspace_name):
             'success': True,
             'file_id': file_id,
             'filename': filename,
-            'message': f'File processed successfully. Found {len(mutated_positions)} mutations in {total_positions} positions.',
-            'immediate_data': {
-                'total_positions': total_positions,
-                'mutation_count': len(mutated_positions),
-                'conserved_count': total_positions - len(mutated_positions),
-                'processing_time': 'Fast mode' if os.path.getsize(filepath) / (1024 * 1024) <= 5 else 'Optimized'
-            }
+            'message': f'File processed successfully. Found {len(mutated_positions)} mutations in {total_positions} positions.'
         })
         
     except Exception as e:

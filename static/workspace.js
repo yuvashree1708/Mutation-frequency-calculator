@@ -127,11 +127,7 @@ class MutationWorkspace {
             if (e.lengthComputable) {
                 const percentComplete = (e.loaded / e.total) * 100;
                 this.updateUploadProgress(percentComplete);
-                if (percentComplete < 100) {
-                    this.updateUploadStatus(`Uploading... ${percentComplete.toFixed(1)}%`);
-                } else {
-                    this.updateUploadStatus('Upload complete! Processing mutations...');
-                }
+                this.updateUploadStatus(`Uploading... ${percentComplete.toFixed(1)}%`);
             }
         });
 
@@ -140,27 +136,11 @@ class MutationWorkspace {
                 const data = JSON.parse(xhr.responseText);
                 
                 if (data.success) {
-                    this.updateUploadStatus('Processing complete! Loading results...');
                     this.hideUploadProgress();
-                    
-                    // Show immediate statistics if available
-                    if (data.immediate_data) {
-                        const stats = data.immediate_data;
-                        this.showToast('Success', 
-                            `${data.message} Processing: ${stats.processing_time}`, 
-                            'success'
-                        );
-                    } else {
-                        this.showToast('Success', data.message, 'success');
-                    }
-                    
+                    this.showToast('Success', data.message, 'success');
                     this.updateUploadStatus('');
-                    
-                    // Immediately load and display the file data
-                    this.loadFileData(data.file_id).then(() => {
-                        // After loading data, refresh history
-                        this.loadHistory();
-                    });
+                    this.loadHistory(); // Refresh history
+                    this.loadFileData(data.file_id); // Load the new file
                     
                     // Clear file input
                     document.getElementById('fileInput').value = '';
@@ -182,7 +162,7 @@ class MutationWorkspace {
             this.updateUploadStatus('Upload failed');
         };
 
-        xhr.timeout = 180000; // 3 minutes timeout - optimized processing
+        xhr.timeout = 300000; // 5 minutes timeout for large files
         xhr.ontimeout = () => {
             this.hideUploadProgress();
             this.showToast('Error', 'Upload timed out. File may be too large.', 'danger');
@@ -564,13 +544,10 @@ class MutationWorkspace {
     }
 
     updateUploadProgress(percentage) {
-        const progressContainer = document.getElementById('upload-progress');
-        if (progressContainer) {
-            const progressBar = progressContainer.querySelector('.progress-bar');
-            if (progressBar) {
-                progressBar.style.width = `${percentage}%`;
-                progressBar.setAttribute('aria-valuenow', percentage);
-            }
+        const progressBar = document.querySelector('#upload-progress .progress-bar');
+        if (progressBar) {
+            progressBar.style.width = `${percentage}%`;
+            progressBar.setAttribute('aria-valuenow', percentage);
         }
     }
 
