@@ -67,21 +67,20 @@ def analyze_mutations(filepath, include_gaps=False):
                 freq_percent = {}
             
             ref_res = str(reference_seq[i])
+            position_number = i + 1  # 1-based position
             
-            # Determine mutation representation
-            if len(freq_percent) == 1 and ref_res in freq_percent:
-                mutation_status = "Green"  # No mutation, fully conserved
-                representation = f"{ref_res} (100%)"
+            # Mutation representation & color coding
+            mutation_freqs = {res: pct for res, pct in freq_percent.items() if res != ref_res}
+            
+            if not mutation_freqs:
+                mutation_status = "Green"
+                representation = f"{ref_res} ({freq_percent.get(ref_res, 100)}%)"
             else:
-                mutation_status = "Red"  # Has mutation(s)
-                # Exclude reference residue from mutation % representation
-                mutation_freqs = {res: pct for res, pct in freq_percent.items() if res != ref_res}
-                # Format mutation representation
-                if mutation_freqs:
-                    mutation_strs = [f"{res} ({pct}%)" for res, pct in mutation_freqs.items()]
-                    representation = "; ".join(mutation_strs)
-                else:
-                    representation = f"{ref_res} (100%)"
+                mutation_status = "Red"
+                # Format mutations as OriginalResidue + PositionNumber + MutatedResidue (Percentage%)
+                mutation_strs = [f"{ref_res}{position_number}{res}({pct}%)" 
+                                 for res, pct in mutation_freqs.items()]
+                representation = ",".join(mutation_strs)
             
             results.append({
                 "Position": i + 1,
