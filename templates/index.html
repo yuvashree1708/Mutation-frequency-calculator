@@ -110,10 +110,16 @@
                                         </div>
                                     </div>
                                     <div class="workspace-action">
-                                        <a href="/workspace/denv?keyword=DENV" class="btn btn-workspace">
-                                            Enter DENV Space
-                                            <i class="fas fa-arrow-right ms-2"></i>
-                                        </a>
+                                        <div class="keyword-access mb-3">
+                                            <label for="denvPasscode" class="form-label text-light">Workspace Keyword:</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control passcode-input" id="denvPasscode" placeholder="Enter DENV" value="DENV">
+                                                <button class="btn btn-workspace" onclick="accessWorkspace('denv', document.getElementById('denvPasscode').value)">
+                                                    Enter DENV Space
+                                                    <i class="fas fa-arrow-right ms-2"></i>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="card-glow denv-glow"></div>
                                 </div>
@@ -145,10 +151,16 @@
                                         </div>
                                     </div>
                                     <div class="workspace-action">
-                                        <a href="/workspace/chikv?keyword=CHIKV" class="btn btn-workspace">
-                                            Enter CHIKV Space
-                                            <i class="fas fa-arrow-right ms-2"></i>
-                                        </a>
+                                        <div class="keyword-access mb-3">
+                                            <label for="chikvPasscode" class="form-label text-light">Workspace Keyword:</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control passcode-input" id="chikvPasscode" placeholder="Enter CHIKV" value="CHIKV">
+                                                <button class="btn btn-workspace" onclick="accessWorkspace('chikv', document.getElementById('chikvPasscode').value)">
+                                                    Enter CHIKV Space
+                                                    <i class="fas fa-arrow-right ms-2"></i>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="card-glow chikv-glow"></div>
                                 </div>
