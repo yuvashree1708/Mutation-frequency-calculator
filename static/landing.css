@@ -352,52 +352,57 @@ html, body {
     margin-top: 5rem;
 }
 
-/* Team Attribution */
-.team-attribution {
-    margin-top: 4rem;
-    padding-top: 2rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+/* Team Section at Top */
+.team-section-top {
+    margin-bottom: 2rem;
 }
 
-.team-member {
+.team-member-top {
     text-align: center;
-    padding: 1.5rem 1rem;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
+    padding: 1rem 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
     transition: all 0.3s ease;
     height: 100%;
 }
 
-.team-member:hover {
-    transform: translateY(-3px);
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(var(--bs-primary-rgb), 0.3);
+.team-member-top:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(var(--bs-primary-rgb), 0.4);
 }
 
-.member-icon {
-    width: 50px;
-    height: 50px;
-    margin: 0 auto 1rem;
+.team-member-top.mentor .member-icon-top {
+    background: linear-gradient(135deg, #dc3545, #fd7e14);
+}
+
+.team-member-top.student .member-icon-top {
     background: linear-gradient(135deg, var(--bs-primary), var(--bs-info));
+}
+
+.member-icon-top {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 0.75rem;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.25rem;
+    font-size: 1rem;
     color: white;
 }
 
-.team-member h6 {
+.team-member-top h6 {
     font-weight: 600;
     margin-bottom: 0.25rem;
     color: var(--bs-body-color);
-    font-size: 1rem;
+    font-size: 0.9rem;
 }
 
-.team-member small {
+.team-member-top small {
     color: var(--bs-secondary);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 500;
 }
 

@@ -18,8 +18,8 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 # Configuration
 UPLOAD_FOLDER = 'uploads'
-ALLOWED_EXTENSIONS = {'fasta', 'fa'}
-MAX_FILE_SIZE = 16 * 1024 * 1024  # 16MB
+ALLOWED_EXTENSIONS = {'fasta', 'fa', 'txt', 'csv'}  # Support multiple alignment formats
+MAX_FILE_SIZE = 100 * 1024 * 1024  # 100MB for large genomic files
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
@@ -66,7 +66,7 @@ def upload_file(workspace_name):
         return jsonify({'error': 'No file selected'}), 400
     
     if not allowed_file(file.filename):
-        return jsonify({'error': 'Invalid file format. Please upload FASTA files only.'}), 400
+        return jsonify({'error': 'Invalid file format. Please upload FASTA, FA, TXT, or CSV files only.'}), 400
     
     try:
         # Generate unique file ID and save uploaded file
