@@ -117,8 +117,8 @@ def upload_file(workspace_name):
         # Add to workspace history (newest first)
         session[session_key].insert(0, file_entry)
         
-        # Keep only last 15 files per workspace (increased for larger storage)
-        session[session_key] = session[session_key][:15]
+        # Keep only last 25 files per workspace (expanded for 3GB storage capacity)
+        session[session_key] = session[session_key][:25]
         session.modified = True
         
         logging.debug(f"File processed: {filename}, mutations at positions: {mutated_positions[:10]}...")

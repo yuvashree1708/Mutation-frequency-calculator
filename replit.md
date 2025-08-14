@@ -6,6 +6,7 @@ This is an interactive bioinformatics web dashboard for analyzing mutation frequ
 
 Preferred communication style: Simple, everyday language.
 File upload preferences: Maximum file size support (3GB per file) for large genomic datasets.
+Workspace storage: Expanded capacity to store up to 25 files per workspace (DENV/CHIKV).
 
 # System Architecture
 
@@ -30,10 +31,11 @@ File upload preferences: Maximum file size support (3GB per file) for large geno
 - **Output Generation**: CSV export functionality with detailed mutation statistics
 
 ## File Storage Strategy
-- **Session-Based History**: File results stored in Flask sessions with 10-file limit (newest first)
+- **Session-Based History**: File results stored in Flask sessions with 25-file limit (newest first) supporting up to 3GB per file
 - **Temporary Processing**: Unique file ID system for secure processing and immediate cleanup
 - **In-Memory Storage**: Complete analysis results stored in session for instant retrieval without re-processing
 - **CSV Export**: Generated CSV files available through download endpoints tied to session data
+- **Large Dataset Support**: Enhanced capacity for comprehensive genomic analysis projects with multiple large files
 
 ## Security Features
 - **File Validation**: Whitelist-based file extension checking and secure filename generation
