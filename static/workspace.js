@@ -18,18 +18,24 @@ class MutationWorkspace {
     }
 
     setupEventListeners() {
-        // File upload handling with validation
-        document.getElementById('fileInput').addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                const file = e.target.files[0];
-                const validation = this.validateFile(file);
-                
-                if (validation.valid) {
-                    this.uploadFile(file);
-                } else {
-                    this.showToast('Error', validation.error, 'danger');
-                    e.target.value = '';
-                }
+        // File upload handling with validation for both upload inputs
+        const fileInputs = ['fileInput', 'fileInputSidebar'];
+        fileInputs.forEach(inputId => {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.addEventListener('change', (e) => {
+                    if (e.target.files.length > 0) {
+                        const file = e.target.files[0];
+                        const validation = this.validateFile(file);
+                        
+                        if (validation.valid) {
+                            this.uploadFile(file);
+                        } else {
+                            this.showToast('Error', validation.error, 'danger');
+                            e.target.value = '';
+                        }
+                    }
+                });
             }
         });
 

@@ -640,6 +640,59 @@ body[data-workspace="chikv"] .file-icon {
     vertical-align: middle;
 }
 
+/* Analysis sidebar styling */
+.analysis-sidebar {
+    min-height: 100vh;
+    background-color: var(--bs-gray-50) !important;
+}
+
+.upload-area {
+    background-color: var(--bs-body-bg);
+    border-color: var(--bs-primary) !important;
+    transition: all 0.3s ease;
+}
+
+.upload-area:hover {
+    border-color: var(--bs-primary) !important;
+    background-color: var(--bs-primary-bg-subtle);
+}
+
+/* Enhanced table container for maximum space */
+.table-container {
+    height: calc(100vh - 350px);
+    overflow-y: auto;
+}
+
+.analysis-main {
+    display: flex;
+    flex-direction: column;
+}
+
+.table-responsive {
+    flex-grow: 1;
+    max-height: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .analysis-sidebar {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 280px;
+        z-index: 1050;
+        transition: right 0.3s ease;
+    }
+    
+    .analysis-sidebar.show {
+        right: 0;
+    }
+    
+    .table-container {
+        height: calc(100vh - 300px);
+    }
+}
+
 /* Mobile responsive mutation display */
 @media (max-width: 768px) {
     .mutation-cell {

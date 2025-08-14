@@ -89,66 +89,72 @@
                 </div>
             </div>
 
-            <!-- Mutation Analysis Section -->
+            <!-- Mutation Analysis Section with Right Sidebar Layout -->
             <div class="analysis-section" id="analysisSection" style="display: none;">
-                <div class="analysis-header border-bottom p-3 bg-body-secondary">
-                    <div class="row align-items-center">
-                        <div class="col">
-                            <h5 class="mb-0" id="currentFileName">Mutation Analysis Results</h5>
-                            <div id="fileInfo" class="text-muted small mt-1"></div>
-                        </div>
-                        <div class="col-auto">
-                            <button id="backToFilesBtn" class="btn btn-outline-secondary me-2">
-                                <i class="fas fa-arrow-left me-1"></i>Back to Files
-                            </button>
-                            <button id="downloadBtn" class="btn btn-success d-none">
-                                <i class="fas fa-download me-1"></i>Download CSV
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <div class="row h-100 g-0">
+                    <!-- Main Analysis Area (Left - 75%) -->
+                    <div class="col-lg-9 col-md-8">
+                        <div class="analysis-main h-100">
+                            <div class="analysis-header border-bottom p-3 bg-body-secondary">
+                                <div class="row align-items-center">
+                                    <div class="col">
+                                        <h5 class="mb-0" id="currentFileName">Mutation Analysis Results</h5>
+                                        <div id="fileInfo" class="text-muted small mt-1"></div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <button id="backToFilesBtn" class="btn btn-outline-secondary me-2">
+                                            <i class="fas fa-arrow-left me-1"></i>Back to Files
+                                        </button>
+                                        <button id="downloadBtn" class="btn btn-success d-none">
+                                            <i class="fas fa-download me-1"></i>Download CSV
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
 
-                <!-- Mutation Positions Panel -->
-                <div class="positions-panel border-bottom p-3" id="positionsPanel">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6 class="text-danger mb-2">
-                                <i class="fas fa-exclamation-triangle me-1"></i>
-                                Mutated Positions (Red)
-                            </h6>
-                            <div id="mutatedPositions" class="position-list"></div>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="text-warning mb-2">
-                                <i class="fas fa-question-circle me-1"></i>
-                                Low Confidence Positions
-                            </h6>
-                            <div id="lowConfPositions" class="position-list"></div>
-                        </div>
-                    </div>
-                </div>
+                            <!-- Mutation Positions Panel -->
+                            <div class="positions-panel border-bottom p-3" id="positionsPanel">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="text-danger mb-2">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>
+                                            Mutated Positions
+                                        </h6>
+                                        <div id="mutatedPositions" class="position-list"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-warning mb-2">
+                                            <i class="fas fa-question-circle me-1"></i>
+                                            Low Confidence
+                                        </h6>
+                                        <div id="lowConfPositions" class="position-list"></div>
+                                    </div>
+                                </div>
+                            </div>
 
-                <!-- Data Table Container -->
-                <div class="table-container p-3">
-                    <div class="table-responsive">
-                        <table id="dataTable" class="table table-striped table-hover">
-                            <thead class="table-dark sticky-top">
-                                <tr>
-                                    <th width="8%">Position</th>
-                                    <th width="10%">Reference</th>
-                                    <th width="12%">Status</th>
-                                    <th width="35%">Mutation Representation</th>
-                                    <th width="12%">Confidence</th>
-                                    <th width="15%">Raw Counts</th>
-                                    <th width="18%">Frequencies (%)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Dynamic content -->
-                            </tbody>
-                        </table>
+                            <!-- Data Table Container with Expanded Space -->
+                            <div class="table-container p-3 flex-grow-1">
+                                <div class="table-responsive h-100">
+                                    <table id="dataTable" class="table table-striped table-hover">
+                                        <thead class="table-dark sticky-top">
+                                            <tr>
+                                                <th width="8%">Position</th>
+                                                <th width="10%">Reference</th>
+                                                <th width="12%">Status</th>
+                                                <th width="40%">Mutation Representation</th>
+                                                <th width="10%">Confidence</th>
+                                                <th width="12%">Raw Counts</th>
+                                                <th width="8%">Frequencies</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Dynamic content -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
             </div>
 
             <!-- Loading Spinner -->
