@@ -517,11 +517,108 @@ body[data-workspace="chikv"] .file-icon {
     font-weight: 500;
 }
 
-/* Mutation representation styling */
-.mutation-repr {
-    font-family: 'Courier New', monospace;
+/* Enhanced mutation representation styling */
+.mutation-cell {
+    padding: 0.8rem 0.6rem !important;
+    line-height: 1.4;
+}
+
+.mutation-repr-enhanced {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.conserved-residue {
+    color: var(--bs-success);
     font-weight: 600;
+    background-color: var(--bs-success-bg-subtle);
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.25rem;
+    border: 1px solid var(--bs-success-border-subtle);
+}
+
+.reference-freq {
+    color: var(--bs-primary);
+    font-weight: 500;
+    background-color: var(--bs-primary-bg-subtle);
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    margin-right: 0.3rem;
+}
+
+.mutation-change {
     color: var(--bs-danger);
+    font-weight: 600;
+    background-color: var(--bs-danger-bg-subtle);
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-family: 'Courier New', monospace;
+    border: 1px solid var(--bs-danger-border-subtle);
+    margin: 0.1rem;
+    display: inline-block;
+}
+
+.separator {
+    color: var(--bs-secondary);
+    font-weight: bold;
+    margin: 0 0.3rem;
+}
+
+/* Enhanced table row highlighting */
+.highlighted-row {
+    background-color: var(--bs-warning-bg-subtle) !important;
+    border: 2px solid var(--bs-warning) !important;
+    transform: scale(1.02);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+    z-index: 5;
+    position: relative;
+}
+
+.highlighted-row td {
+    font-weight: 600;
+}
+
+.highlighted-row td:first-child {
+    background-color: var(--bs-warning) !important;
+    color: var(--bs-dark) !important;
+    font-size: 1.2rem !important;
+}
+
+/* Enhanced hover effects for table rows */
+#dataTable tbody tr:hover {
+    background-color: var(--bs-primary-bg-subtle);
+    transform: scale(1.01);
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    cursor: pointer;
+}
+
+/* Improved mutation representation layout */
+.mutation-repr-enhanced .reference-freq,
+.mutation-repr-enhanced .mutation-change {
+    display: inline-block;
+    margin: 0.1rem 0.2rem;
+    white-space: nowrap;
+}
+
+/* Mobile responsive mutation display */
+@media (max-width: 768px) {
+    .mutation-cell {
+        padding: 0.5rem 0.3rem !important;
+    }
+    
+    .mutation-repr-enhanced {
+        font-size: 0.8rem;
+    }
+    
+    .mutation-change,
+    .reference-freq {
+        padding: 0.1rem 0.3rem;
+        font-size: 0.75rem;
+        margin: 0.05rem;
+    }
 }
 
 .view-table-btn {

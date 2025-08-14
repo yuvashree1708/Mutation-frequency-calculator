@@ -355,8 +355,8 @@ class MutationWorkspace {
                         '<span class="badge bg-danger"><i class="fas fa-exclamation me-1"></i>Mutated</span>'
                     }
                 </td>
-                <td>
-                    <span class="mutation-repr">${result['Mutation Representation']}</span>
+                <td class="mutation-cell">
+                    <div class="mutation-repr-enhanced">${this.formatMutationRepresentation(result['Mutation Representation'], result.Color)}</div>
                 </td>
                 <td class="text-center">
                     ${result.Ambiguity === 'High-confidence' ?
@@ -411,6 +411,57 @@ class MutationWorkspace {
 
         // Add custom styling for DataTables elements
         this.styleDataTable();
+        
+        // Add event listeners for position badge clicks and table row highlighting
+        this.addTableInteractions();
+    }
+    
+    formatMutationRepresentation(representation, color) {
+        if (color === 'Green') {
+            return `<span class="conserved-residue">${representation}</span>`;
+        } else {
+            // Split by | and format each part for enhanced readability
+            const parts = representation.split(' | ');
+            return parts.map(part => {
+                if (part.includes('(') && !part.match(/^[A-Z]\d+[A-Z]/)) {
+                    // Reference residue part (e.g., "A (20%)")
+                    return `<span class="reference-freq">${part}</span>`;
+                } else {
+                    // Mutation part (format: A123T (50%))
+                    return `<span class="mutation-change">${part}</span>`;
+                }
+            }).join('<span class="separator"> | </span>');
+        }
+    }
+    
+    addTableInteractions() {
+        // Position badge click handlers
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('position-badge')) {
+                const position = parseInt(e.target.getAttribute('data-position'));
+                this.scrollToPosition(position);
+            }
+        });
+        
+        // Table row click highlighting
+        $(document).on('click', '#dataTable tbody tr', (e) => {
+            const $row = $(e.currentTarget);
+            const position = $row.data('position');
+            
+            // Remove previous highlights
+            $('#dataTable tbody tr').removeClass('highlighted-row');
+            
+            // Add highlight to clicked row
+            $row.addClass('highlighted-row');
+            
+            // Show position info toast
+            this.showToast('Position Selected', `Position ${position} highlighted`, 'info');
+            
+            // Auto-remove highlight after 5 seconds
+            setTimeout(() => {
+                $row.removeClass('highlighted-row');
+            }, 5000);
+        });
     }
 
     styleDataTable() {

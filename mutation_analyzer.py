@@ -79,19 +79,30 @@ def analyze_mutations(filepath, include_gaps=False):
             ref_res = str(reference_seq[i])
             position_number = i + 1  # 1-based position
             
-            # Mutation representation & color coding
+            # Enhanced mutation representation & color coding with clear formatting
             mutation_freqs = {res: pct for res, pct in freq_percent.items() if res != ref_res}
             
             if not mutation_freqs:
                 mutation_status = "Green"
-                representation = f"{ref_res} ({freq_percent.get(ref_res, 100)}%)"
+                # Show reference residue with its frequency
+                ref_freq = freq_percent.get(ref_res, 100)
+                representation = f"{ref_res} ({ref_freq}%)"
             else:
                 mutation_status = "Red"
-                # Format mutations as OriginalResidue + PositionNumber + MutatedResidue (Percentage%)
-                mutation_strs = [f"{ref_res}{position_number}{res}({pct}%)" 
-                                 for res, pct in mutation_freqs.items()]
-                representation = ",".join(mutation_strs)
-                logging.debug(f"Position {position_number}: New format representation = {representation}")
+                # Enhanced format: show reference frequency + all mutations clearly separated
+                ref_freq = freq_percent.get(ref_res, 0)
+                representation_parts = []
+                
+                # Add reference residue frequency if present
+                if ref_freq > 0:
+                    representation_parts.append(f"{ref_res} ({ref_freq}%)")
+                
+                # Add each mutation clearly formatted with position
+                for res, pct in sorted(mutation_freqs.items()):
+                    representation_parts.append(f"{ref_res}{position_number}{res} ({pct}%)")
+                
+                representation = " | ".join(representation_parts)
+                logging.debug(f"Position {position_number}: Enhanced representation = {representation}")
             
             results.append({
                 "Position": i + 1,
