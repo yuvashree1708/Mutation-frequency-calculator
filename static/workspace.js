@@ -11,13 +11,22 @@ class MutationWorkspace {
     init() {
         this.setupEventListeners();
         this.loadHistory();
+        this.setupMobileMenu();
     }
 
     setupEventListeners() {
-        // File upload handling
+        // File upload handling with validation
         document.getElementById('fileInput').addEventListener('change', (e) => {
             if (e.target.files.length > 0) {
-                this.uploadFile(e.target.files[0]);
+                const file = e.target.files[0];
+                const validation = this.validateFile(file);
+                
+                if (validation.valid) {
+                    this.uploadFile(file);
+                } else {
+                    this.showToast('Error', validation.error, 'danger');
+                    e.target.value = '';
+                }
             }
         });
 
@@ -48,6 +57,49 @@ class MutationWorkspace {
                 this.scrollToPosition(position);
             }
         });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => this.handleKeyboard(e));
+    }
+
+    setupMobileMenu() {
+        // Add mobile menu toggle for responsive design
+        if (window.innerWidth <= 768) {
+            const contentHeader = document.querySelector('.content-header');
+            const toggleBtn = document.createElement('button');
+            toggleBtn.className = 'mobile-menu-toggle btn btn-primary';
+            toggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            toggleBtn.addEventListener('click', this.toggleMobileSidebar);
+            contentHeader.appendChild(toggleBtn);
+        }
+    }
+
+    toggleMobileSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        sidebar.classList.toggle('show');
+    }
+
+    validateFile(file) {
+        const allowedTypes = ['fasta', 'fa'];
+        const maxSize = 16 * 1024 * 1024; // 16MB
+        
+        const extension = file.name.split('.').pop().toLowerCase();
+        
+        if (!allowedTypes.includes(extension)) {
+            return { 
+                valid: false, 
+                error: 'Invalid file type. Please select a FASTA file (.fasta or .fa).' 
+            };
+        }
+        
+        if (file.size > maxSize) {
+            return { 
+                valid: false, 
+                error: 'File size exceeds 16MB limit. Please choose a smaller file.' 
+            };
+        }
+        
+        return { valid: true };
     }
 
     uploadFile(file) {
@@ -58,7 +110,7 @@ class MutationWorkspace {
         this.showUploadProgress();
         this.updateUploadStatus('Uploading and processing file...');
 
-        fetch('/upload', {
+        fetch(`/upload/${this.workspace}`, {
             method: 'POST',
             body: formData
         })
@@ -87,7 +139,7 @@ class MutationWorkspace {
     }
 
     loadHistory() {
-        fetch('/api/history')
+        fetch(`/api/${this.workspace}/history`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -101,7 +153,6 @@ class MutationWorkspace {
 
     renderHistory(history) {
         const historyList = document.getElementById('historyList');
-        const emptyHistory = document.getElementById('emptyHistory');
         
         if (history.length === 0) {
             historyList.innerHTML = `
@@ -114,15 +165,14 @@ class MutationWorkspace {
         }
 
         const historyHtml = history.map(file => `
-            <div class="history-item" data-file-id="${file.id}">
+            <div class="history-item fade-in" data-file-id="${file.id}">
                 <div class="file-name">${file.original_filename}</div>
                 <div class="file-meta">
                     <small class="text-muted">${file.upload_time}</small>
                 </div>
                 <div class="file-stats">
-                    <small>
-                        <span class="badge bg-danger">${file.mutation_count}</span> mutations
-                    </small>
+                    <span class="badge bg-danger">${file.mutation_count}</span>
+                    <span class="badge bg-secondary">${file.total_positions}</span>
                 </div>
             </div>
         `).join('');
@@ -135,7 +185,7 @@ class MutationWorkspace {
         
         this.showLoadingSpinner();
         
-        fetch(`/api/file/${fileId}`)
+        fetch(`/api/${this.workspace}/file/${fileId}`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -156,8 +206,11 @@ class MutationWorkspace {
     renderFileData(fileData) {
         // Update header
         document.getElementById('currentFileName').textContent = fileData.original_filename;
-        document.getElementById('fileInfo').textContent = 
-            `${fileData.total_positions} positions • ${fileData.mutation_count} mutations • Uploaded ${fileData.upload_time}`;
+        document.getElementById('fileInfo').innerHTML = `
+            <i class="fas fa-chart-bar me-1"></i>${fileData.total_positions} positions analyzed • 
+            <i class="fas fa-exclamation-triangle text-danger me-1"></i>${fileData.mutation_count} mutations found • 
+            <i class="fas fa-clock me-1"></i>Uploaded ${fileData.upload_time}
+        `;
 
         // Show download button
         document.getElementById('downloadBtn').classList.remove('d-none');
@@ -182,17 +235,17 @@ class MutationWorkspace {
         // Render mutated positions
         if (mutatedPositions.length > 0) {
             const mutatedHtml = mutatedPositions.map(pos => 
-                `<span class="position-badge" title="Jump to position ${pos}">${pos}</span>`
+                `<button class="position-badge" title="Jump to position ${pos}" data-position="${pos}">${pos}</button>`
             ).join('');
             mutatedContainer.innerHTML = mutatedHtml;
         } else {
-            mutatedContainer.innerHTML = '<span class="text-muted small">No mutations found</span>';
+            mutatedContainer.innerHTML = '<span class="text-muted small">No mutations detected</span>';
         }
 
         // Render low confidence positions
         if (lowConfPositions.length > 0) {
             const lowConfHtml = lowConfPositions.map(pos => 
-                `<span class="position-badge low-conf" title="Jump to position ${pos}">${pos}</span>`
+                `<button class="position-badge low-conf" title="Jump to position ${pos}" data-position="${pos}">${pos}</button>`
             ).join('');
             lowConfContainer.innerHTML = lowConfHtml;
         } else {
@@ -209,12 +262,12 @@ class MutationWorkspace {
 
         const tableBody = document.querySelector('#dataTable tbody');
         
-        // Generate table rows
+        // Generate table rows with enhanced styling
         const rowsHtml = results.map(result => `
-            <tr data-color="${result.Color}" data-ambiguity="${result.Ambiguity}" data-position="${result.Position}">
-                <td>${result.Position}</td>
-                <td><code>${result.Reference}</code></td>
-                <td>
+            <tr data-color="${result.Color}" data-ambiguity="${result.Ambiguity}" data-position="${result.Position}" class="slide-up">
+                <td class="text-center fw-bold">${result.Position}</td>
+                <td class="text-center"><code>${result.Reference}</code></td>
+                <td class="text-center">
                     ${result.Color === 'Green' ? 
                         '<span class="badge bg-success"><i class="fas fa-check me-1"></i>Conserved</span>' :
                         '<span class="badge bg-danger"><i class="fas fa-exclamation me-1"></i>Mutated</span>'
@@ -223,53 +276,83 @@ class MutationWorkspace {
                 <td>
                     <span class="mutation-repr">${result['Mutation Representation']}</span>
                 </td>
-                <td>
+                <td class="text-center">
                     ${result.Ambiguity === 'High-confidence' ?
                         '<span class="badge bg-info">High</span>' :
-                        '<span class="badge bg-warning">Low</span>'
+                        '<span class="badge bg-warning text-dark">Low</span>'
                     }
                 </td>
-                <td><small class="text-muted">${result.Counts}</small></td>
-                <td><small class="text-muted">${result['Frequencies (%)']}</small></td>
+                <td><small class="text-muted font-monospace">${result.Counts}</small></td>
+                <td><small class="text-muted font-monospace">${result['Frequencies (%)']}</small></td>
             </tr>
         `).join('');
         
         tableBody.innerHTML = rowsHtml;
 
-        // Initialize DataTable
+        // Initialize DataTable with enhanced options
         this.dataTable = $('#dataTable').DataTable({
-            pageLength: 25,
-            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+            pageLength: 50,
+            lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
             order: [[0, 'asc']], // Sort by position
             columnDefs: [
                 {
                     targets: [5, 6], // Raw counts and frequencies columns
                     orderable: false
+                },
+                {
+                    targets: [0], // Position column
+                    className: 'text-center fw-bold'
+                },
+                {
+                    targets: [1, 2, 4], // Reference, Status, Confidence columns
+                    className: 'text-center'
                 }
             ],
             language: {
-                search: "Search positions:",
+                search: "Search positions and mutations:",
                 lengthMenu: "Show _MENU_ positions per page",
                 info: "Showing _START_ to _END_ of _TOTAL_ positions",
                 infoEmpty: "No positions found",
-                infoFiltered: "(filtered from _MAX_ total positions)"
+                infoFiltered: "(filtered from _MAX_ total positions)",
+                paginate: {
+                    first: "First",
+                    last: "Last",
+                    next: "Next",
+                    previous: "Prev"
+                }
             },
-            dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>><"row"<"col-sm-12"t>><"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+            dom: '<"row mb-3"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>><"row"<"col-sm-12"t>><"row mt-3"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
             scrollY: 'calc(100vh - 400px)',
-            scrollCollapse: true
+            scrollCollapse: true,
+            responsive: true,
+            autoWidth: false,
+            processing: true
         });
+
+        // Add custom styling for DataTables elements
+        this.styleDataTable();
+    }
+
+    styleDataTable() {
+        // Add custom classes to DataTables controls
+        $('.dataTables_filter input').addClass('form-control-sm');
+        $('.dataTables_length select').addClass('form-select-sm');
+        
+        // Add icons to pagination buttons
+        $('.paginate_button.previous').html('<i class="fas fa-chevron-left me-1"></i>Previous');
+        $('.paginate_button.next').html('Next<i class="fas fa-chevron-right ms-1"></i>');
     }
 
     scrollToPosition(position) {
         if (!this.dataTable) return;
 
-        // Search for the position in DataTable
-        this.dataTable.search('').draw(); // Clear any existing search
+        // Clear any existing search and show all rows
+        this.dataTable.search('').draw();
         
         // Find the row with the specific position
         const targetRow = document.querySelector(`#dataTable tbody tr[data-position="${position}"]`);
         if (targetRow) {
-            // Scroll to the row
+            // Scroll to the row smoothly
             targetRow.scrollIntoView({ 
                 behavior: 'smooth', 
                 block: 'center' 
@@ -277,9 +360,17 @@ class MutationWorkspace {
             
             // Highlight the row temporarily
             targetRow.style.backgroundColor = 'var(--bs-warning-bg-subtle)';
+            targetRow.style.transform = 'scale(1.02)';
+            
             setTimeout(() => {
                 targetRow.style.backgroundColor = '';
+                targetRow.style.transform = '';
             }, 2000);
+
+            // Show success toast
+            this.showToast('Position Found', `Scrolled to position ${position}`, 'success');
+        } else {
+            this.showToast('Position Not Found', `Position ${position} is not visible in current view`, 'warning');
         }
     }
 
@@ -294,17 +385,17 @@ class MutationWorkspace {
     }
 
     clearHistory() {
-        if (!confirm('Are you sure you want to clear the file history?')) {
+        if (!confirm(`Are you sure you want to clear the ${this.workspace.toUpperCase()} workspace history?`)) {
             return;
         }
 
-        fetch('/api/clear-history', {
+        fetch(`/api/${this.workspace}/clear-history`, {
             method: 'POST'
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                this.showToast('Success', 'History cleared', 'success');
+                this.showToast('Success', 'History cleared successfully', 'success');
                 this.loadHistory();
                 this.resetView();
             }
@@ -319,13 +410,22 @@ class MutationWorkspace {
         
         const filename = document.getElementById('downloadBtn').getAttribute('data-filename');
         if (filename) {
-            window.location.href = `/download/${filename}`;
+            // Create temporary link for download
+            const link = document.createElement('a');
+            link.href = `/download/${filename}`;
+            link.download = filename;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            this.showToast('Download', 'CSV file download started', 'success');
         }
     }
 
     resetView() {
         this.currentFileId = null;
-        document.getElementById('currentFileName').textContent = 'Select a file to view analysis results';
+        document.getElementById('currentFileName').textContent = 'Select a FASTA file to view mutation analysis';
         document.getElementById('fileInfo').textContent = '';
         document.getElementById('downloadBtn').classList.add('d-none');
         document.getElementById('positionsPanel').style.display = 'none';
@@ -379,6 +479,9 @@ class MutationWorkspace {
         } else if (type === 'danger') {
             icon = 'fas fa-exclamation-triangle';
             colorClass = 'text-danger';
+        } else if (type === 'warning') {
+            icon = 'fas fa-exclamation-circle';
+            colorClass = 'text-warning';
         }
         
         toastHeader.innerHTML = `
@@ -390,55 +493,51 @@ class MutationWorkspace {
         toastBody.textContent = message;
         
         // Show toast
-        const bsToast = new bootstrap.Toast(toast);
+        const bsToast = new bootstrap.Toast(toast, { delay: 4000 });
         bsToast.show();
     }
-}
 
-// Initialize dashboard when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
-    window.dashboard = new MutationDashboard();
-});
-
-// Utility functions for file validation
-function validateFile(file) {
-    const allowedTypes = ['fasta', 'fa', 'txt', 'csv'];
-    const maxSize = 16 * 1024 * 1024; // 16MB
-    
-    const extension = file.name.split('.').pop().toLowerCase();
-    
-    if (!allowedTypes.includes(extension)) {
-        return { valid: false, error: 'Invalid file type. Please select a FASTA, TXT, or CSV file.' };
-    }
-    
-    if (file.size > maxSize) {
-        return { valid: false, error: 'File size exceeds 16MB limit. Please choose a smaller file.' };
-    }
-    
-    return { valid: true };
-}
-
-// Keyboard shortcuts
-document.addEventListener('keydown', function(e) {
-    // Ctrl/Cmd + U for upload
-    if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
-        e.preventDefault();
-        document.getElementById('fileInput').click();
-    }
-    
-    // Ctrl/Cmd + D for download (if file is selected)
-    if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
-        e.preventDefault();
-        const downloadBtn = document.getElementById('downloadBtn');
-        if (!downloadBtn.classList.contains('d-none')) {
-            downloadBtn.click();
+    handleKeyboard(e) {
+        // Ctrl/Cmd + U for upload
+        if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
+            e.preventDefault();
+            document.getElementById('fileInput').click();
+        }
+        
+        // Ctrl/Cmd + D for download (if file is selected)
+        if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+            e.preventDefault();
+            const downloadBtn = document.getElementById('downloadBtn');
+            if (!downloadBtn.classList.contains('d-none')) {
+                downloadBtn.click();
+            }
+        }
+        
+        // Escape key to clear selection
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.history-item.active').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Hide mobile sidebar if open
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.remove('show');
         }
     }
-    
-    // Escape key to clear selection
-    if (e.key === 'Escape') {
-        document.querySelectorAll('.history-item.active').forEach(item => {
-            item.classList.remove('active');
-        });
+}
+
+// Initialize workspace when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    window.mutationWorkspace = new MutationWorkspace();
+});
+
+// Handle window resize
+window.addEventListener('resize', function() {
+    if (window.innerWidth > 768) {
+        const sidebar = document.querySelector('.sidebar');
+        sidebar.classList.remove('show');
     }
 });
+
+// Add smooth scrolling for better UX
+document.documentElement.style.scrollBehavior = 'smooth';

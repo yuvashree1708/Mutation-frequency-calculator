@@ -18,7 +18,7 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 # Configuration
 UPLOAD_FOLDER = 'uploads'
-ALLOWED_EXTENSIONS = {'fasta', 'fa', 'txt', 'csv'}
+ALLOWED_EXTENSIONS = {'fasta', 'fa'}
 MAX_FILE_SIZE = 16 * 1024 * 1024  # 16MB
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -34,16 +34,30 @@ def allowed_file(filename):
 
 @app.route('/')
 def index():
-    """Main dashboard with sidebar and interactive table."""
-    # Initialize session history if not exists
-    if 'file_history' not in session:
-        session['file_history'] = []
-    
-    return render_template('dashboard.html', history=session.get('file_history', []))
+    """Main landing page with workspace selection."""
+    return render_template('index.html')
 
-@app.route('/upload', methods=['POST'])
-def upload_file():
+@app.route('/workspace/<workspace_name>')
+def workspace(workspace_name):
+    """Workspace dashboard for DENV or CHIKV analysis."""
+    if workspace_name not in ['denv', 'chikv']:
+        return redirect(url_for('index'))
+    
+    # Initialize workspace-specific session history
+    session_key = f'{workspace_name}_history'
+    if session_key not in session:
+        session[session_key] = []
+    
+    return render_template('workspace.html', 
+                         workspace=workspace_name, 
+                         history=session.get(session_key, []))
+
+@app.route('/upload/<workspace_name>', methods=['POST'])
+def upload_file(workspace_name):
     """Handle file upload and process mutation analysis via AJAX."""
+    if workspace_name not in ['denv', 'chikv']:
+        return jsonify({'error': 'Invalid workspace'}), 400
+        
     if 'file' not in request.files:
         return jsonify({'error': 'No file selected'}), 400
     
@@ -52,7 +66,7 @@ def upload_file():
         return jsonify({'error': 'No file selected'}), 400
     
     if not allowed_file(file.filename):
-        return jsonify({'error': 'Invalid file format. Please upload FASTA, TXT, or CSV files only.'}), 400
+        return jsonify({'error': 'Invalid file format. Please upload FASTA files only.'}), 400
     
     try:
         # Generate unique file ID and save uploaded file
@@ -69,11 +83,12 @@ def upload_file():
         mutated_positions = [r['Position'] for r in results if r['Color'] == 'Red']
         low_conf_positions = [r['Position'] for r in results if r['Ambiguity'] == 'Low-confidence']
         
-        # Create file entry for history
+        # Create file entry for workspace history
         file_entry = {
             'id': file_id,
             'filename': filename,
             'original_filename': file.filename,
+            'workspace': workspace_name,
             'timestamp': datetime.now().isoformat(),
             'upload_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             'results': results,
@@ -85,15 +100,16 @@ def upload_file():
             'conserved_count': total_positions - len(mutated_positions)
         }
         
-        # Initialize session history if not exists
-        if 'file_history' not in session:
-            session['file_history'] = []
+        # Initialize workspace-specific session history
+        session_key = f'{workspace_name}_history'
+        if session_key not in session:
+            session[session_key] = []
         
-        # Add to history (newest first)
-        session['file_history'].insert(0, file_entry)
+        # Add to workspace history (newest first)
+        session[session_key].insert(0, file_entry)
         
-        # Keep only last 10 files
-        session['file_history'] = session['file_history'][:10]
+        # Keep only last 10 files per workspace
+        session[session_key] = session[session_key][:10]
         session.modified = True
         
         logging.debug(f"File processed: {filename}, mutations at positions: {mutated_positions[:10]}...")
@@ -130,15 +146,19 @@ def download_file(filename):
         flash('Error downloading file', 'error')
         return redirect(url_for('index'))
 
-@app.route('/api/file/<file_id>')
-def get_file_data(file_id):
+@app.route('/api/<workspace_name>/file/<file_id>')
+def get_file_data(workspace_name, file_id):
     """Get file data for display in the main table."""
-    if 'file_history' not in session:
+    if workspace_name not in ['denv', 'chikv']:
+        return jsonify({'error': 'Invalid workspace'}), 400
+        
+    session_key = f'{workspace_name}_history'
+    if session_key not in session:
         return jsonify({'error': 'No files in history'}), 404
     
-    # Find file in history
+    # Find file in workspace history
     file_data = None
-    for entry in session['file_history']:
+    for entry in session[session_key]:
         if entry['id'] == file_id:
             file_data = entry
             break
@@ -151,18 +171,26 @@ def get_file_data(file_id):
         'file_data': file_data
     })
 
-@app.route('/api/history')
-def get_history():
-    """Get current file history."""
+@app.route('/api/<workspace_name>/history')
+def get_history(workspace_name):
+    """Get current workspace file history."""
+    if workspace_name not in ['denv', 'chikv']:
+        return jsonify({'error': 'Invalid workspace'}), 400
+        
+    session_key = f'{workspace_name}_history'
     return jsonify({
         'success': True,
-        'history': session.get('file_history', [])
+        'history': session.get(session_key, [])
     })
 
-@app.route('/api/clear-history', methods=['POST'])
-def clear_history():
-    """Clear file history."""
-    session['file_history'] = []
+@app.route('/api/<workspace_name>/clear-history', methods=['POST'])
+def clear_history(workspace_name):
+    """Clear workspace file history."""
+    if workspace_name not in ['denv', 'chikv']:
+        return jsonify({'error': 'Invalid workspace'}), 400
+        
+    session_key = f'{workspace_name}_history'
+    session[session_key] = []
     session.modified = True
     return jsonify({'success': True, 'message': 'History cleared'})
 

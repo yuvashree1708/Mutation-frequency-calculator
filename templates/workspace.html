@@ -9,27 +9,42 @@
     <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='workspace.css') }}">
 </head>
-<body>
+<body data-workspace="{{ workspace }}">
     <div class="container-fluid h-100">
         <div class="row h-100">
             <!-- Sidebar -->
-            <div class="col-md-3 col-lg-2 sidebar bg-body-secondary h-100 p-0">
+            <div class="col-md-3 col-lg-2 sidebar h-100 p-0">
                 <div class="sidebar-content d-flex flex-column h-100">
                     <!-- Header -->
                     <div class="sidebar-header p-3 border-bottom">
-                        <h5 class="mb-0">
-                            <i class="fas fa-dna me-2"></i>
-                            Mutation Analysis
-                        </h5>
+                        <div class="d-flex align-items-center mb-2">
+                            <a href="{{ url_for('index') }}" class="btn btn-sm btn-outline-secondary me-2" title="Back to Home">
+                                <i class="fas fa-arrow-left"></i>
+                            </a>
+                            <h6 class="mb-0 workspace-title">
+                                {% if workspace == 'denv' %}
+                                    <i class="fas fa-virus me-2 text-danger"></i>DENV Space
+                                {% else %}
+                                    <i class="fas fa-microscope me-2 text-success"></i>CHIKV Space
+                                {% endif %}
+                            </h6>
+                        </div>
+                        <small class="text-muted">
+                            {% if workspace == 'denv' %}
+                                Dengue Virus Analysis
+                            {% else %}
+                                Chikungunya Virus Analysis
+                            {% endif %}
+                        </small>
                     </div>
 
                     <!-- Upload Section -->
                     <div class="upload-section p-3 border-bottom">
                         <label for="fileInput" class="btn btn-primary w-100 mb-2">
                             <i class="fas fa-upload me-2"></i>
-                            Upload File
+                            Upload FASTA
                         </label>
-                        <input type="file" id="fileInput" class="d-none" accept=".fasta,.fa,.txt,.csv">
+                        <input type="file" id="fileInput" class="d-none" accept=".fasta,.fa">
                         
                         <div id="uploadProgress" class="progress d-none mb-2" style="height: 3px;">
                             <div class="progress-bar" role="progressbar" style="width: 0%"></div>
@@ -58,6 +73,7 @@
                                         <div class="file-stats">
                                             <small>
                                                 <span class="badge bg-danger">{{ file.mutation_count }}</span> mutations
+                                                <span class="badge bg-secondary">{{ file.total_positions }}</span> positions
                                             </small>
                                         </div>
                                     </div>
@@ -78,10 +94,10 @@
             <div class="col-md-9 col-lg-10 main-content p-0">
                 <div class="main-content-inner h-100 d-flex flex-column">
                     <!-- Header Bar -->
-                    <div class="content-header bg-body-tertiary border-bottom p-3">
+                    <div class="content-header border-bottom p-3">
                         <div class="row align-items-center">
                             <div class="col">
-                                <h4 class="mb-0" id="currentFileName">Select a file to view analysis results</h4>
+                                <h4 class="mb-0" id="currentFileName">Select a FASTA file to view mutation analysis</h4>
                                 <div id="fileInfo" class="text-muted small mt-1"></div>
                             </div>
                             <div class="col-auto">
@@ -94,12 +110,12 @@
                     </div>
 
                     <!-- Mutation Positions Panel -->
-                    <div class="positions-panel bg-body-secondary border-bottom p-3" id="positionsPanel" style="display: none;">
+                    <div class="positions-panel border-bottom p-3" id="positionsPanel" style="display: none;">
                         <div class="row">
                             <div class="col-md-6">
                                 <h6 class="text-danger mb-2">
                                     <i class="fas fa-exclamation-triangle me-1"></i>
-                                    Mutated Positions
+                                    Mutated Positions (Red)
                                 </h6>
                                 <div id="mutatedPositions" class="position-list"></div>
                             </div>
@@ -113,26 +129,66 @@
                         </div>
                     </div>
 
-                    <!-- Data Table -->
+                    <!-- Data Table Container -->
                     <div class="table-container flex-grow-1 overflow-auto p-3">
                         <div id="welcomeMessage" class="text-center py-5">
-                            <i class="fas fa-table fa-4x text-muted mb-3"></i>
-                            <h5 class="text-muted">Welcome to Mutation Analysis Dashboard</h5>
-                            <p class="text-muted">Upload a sequence file or select from history to begin analysis</p>
+                            <div class="welcome-icon mb-4">
+                                {% if workspace == 'denv' %}
+                                    <i class="fas fa-virus fa-4x text-danger opacity-25"></i>
+                                {% else %}
+                                    <i class="fas fa-microscope fa-4x text-success opacity-25"></i>
+                                {% endif %}
+                            </div>
+                            <h5 class="text-muted mb-3">
+                                Welcome to {{ workspace.upper() }} Workspace
+                            </h5>
+                            <p class="text-muted">
+                                Upload a FASTA file to analyze 
+                                {% if workspace == 'denv' %}dengue virus{% else %}chikungunya virus{% endif %}
+                                mutation frequencies
+                            </p>
+                            <div class="welcome-features mt-4">
+                                <div class="row justify-content-center g-3">
+                                    <div class="col-md-3 col-6">
+                                        <div class="welcome-feature">
+                                            <i class="fas fa-palette text-primary mb-2"></i>
+                                            <small>Color-coded mutations</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <div class="welcome-feature">
+                                            <i class="fas fa-table text-primary mb-2"></i>
+                                            <small>Scrollable results</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <div class="welcome-feature">
+                                            <i class="fas fa-history text-primary mb-2"></i>
+                                            <small>Session tracking</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <div class="welcome-feature">
+                                            <i class="fas fa-download text-primary mb-2"></i>
+                                            <small>CSV export</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div id="tableContainer" class="d-none">
                             <div class="table-responsive">
                                 <table id="dataTable" class="table table-striped table-hover">
-                                    <thead>
+                                    <thead class="table-dark sticky-top">
                                         <tr>
-                                            <th>Position</th>
-                                            <th>Reference</th>
-                                            <th>Status</th>
-                                            <th>Mutation Representation</th>
-                                            <th>Confidence</th>
-                                            <th>Raw Counts</th>
-                                            <th>Frequencies (%)</th>
+                                            <th width="8%">Position</th>
+                                            <th width="10%">Reference</th>
+                                            <th width="12%">Status</th>
+                                            <th width="35%">Mutation Representation</th>
+                                            <th width="12%">Confidence</th>
+                                            <th width="15%">Raw Counts</th>
+                                            <th width="18%">Frequencies (%)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -143,10 +199,11 @@
                         </div>
 
                         <div id="loadingSpinner" class="text-center py-5 d-none">
-                            <div class="spinner-border text-primary" role="status">
+                            <div class="spinner-border text-primary mb-3" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
-                            <p class="mt-2 text-muted">Processing file...</p>
+                            <h6 class="text-muted">Processing FASTA file...</h6>
+                            <p class="text-muted small">Analyzing mutation frequencies and patterns</p>
                         </div>
                     </div>
                 </div>
@@ -173,6 +230,10 @@
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+    <script>
+        // Pass workspace name to JavaScript
+        window.WORKSPACE = '{{ workspace }}';
+    </script>
+    <script src="{{ url_for('static', filename='workspace.js') }}"></script>
 </body>
 </html>
