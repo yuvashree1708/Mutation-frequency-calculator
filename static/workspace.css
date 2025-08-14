@@ -153,6 +153,131 @@ body[data-workspace="chikv"] .history-item.active {
     border-color: rgba(255, 255, 255, 0.5);
 }
 
+/* New File Grid Layout */
+.workspace-header {
+    background: var(--bs-body-tertiary);
+    border-bottom: 2px solid var(--bs-border-color);
+}
+
+.main-workspace-content {
+    height: calc(100vh - 120px);
+    overflow-y: auto;
+}
+
+.files-section {
+    min-height: 100%;
+}
+
+.files-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.file-card {
+    background: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    cursor: pointer;
+}
+
+.file-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: var(--bs-primary);
+}
+
+.file-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.file-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--bs-primary), var(--bs-info));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.file-stats-badges {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.file-stats-badges .badge {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.6rem;
+}
+
+.file-card-body {
+    margin-bottom: 1.5rem;
+}
+
+.file-title {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    word-break: break-word;
+    line-height: 1.4;
+}
+
+.file-meta {
+    margin-bottom: 0.5rem;
+}
+
+.file-stats-text {
+    font-size: 0.85rem;
+    color: var(--bs-secondary);
+}
+
+.file-card-footer .btn {
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+}
+
+/* Analysis Section Styles */
+.analysis-section {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.analysis-header {
+    flex-shrink: 0;
+}
+
+.table-container {
+    flex-grow: 1;
+    overflow: auto;
+}
+
+/* Empty State */
+.empty-state {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* Workspace-specific file card styling */
+body[data-workspace="denv"] .file-icon {
+    background: linear-gradient(135deg, #dc3545, #fd7e14);
+}
+
+body[data-workspace="chikv"] .file-icon {
+    background: linear-gradient(135deg, #20c997, #0dcaf0);
+}
+
 /* Main Content Styles */
 .main-content {
     height: 100vh;

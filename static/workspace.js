@@ -50,6 +50,14 @@ class MutationWorkspace {
             this.downloadCurrentFile();
         });
 
+        // Back to files button
+        const backToFilesBtn = document.getElementById('backToFilesBtn');
+        if (backToFilesBtn) {
+            backToFilesBtn.addEventListener('click', () => {
+                this.resetView();
+            });
+        }
+
         // Position badge clicks (scroll to position in table)
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('position-badge')) {
@@ -152,48 +160,57 @@ class MutationWorkspace {
     }
 
     renderHistory(history) {
-        const historyList = document.getElementById('historyList');
+        const filesGrid = document.getElementById('filesGrid');
+        const emptyFiles = document.getElementById('emptyFiles');
         
         if (history.length === 0) {
-            historyList.innerHTML = `
-                <div id="emptyHistory" class="text-center text-muted py-4">
-                    <i class="fas fa-history fa-2x mb-2 opacity-50"></i>
-                    <p class="small">No files uploaded yet</p>
-                </div>
-            `;
+            filesGrid.innerHTML = '';
+            emptyFiles.style.display = 'block';
             return;
         }
 
-        const historyHtml = history.map(file => `
-            <div class="history-item fade-in" data-file-id="${file.id}">
-                <div class="file-name">${file.original_filename}</div>
-                <div class="file-meta">
-                    <small class="text-muted">${file.upload_time}</small>
+        emptyFiles.style.display = 'none';
+        
+        const filesHtml = history.map(file => `
+            <div class="file-card" data-file-id="${file.id}">
+                <div class="file-card-header">
+                    <div class="file-icon">
+                        <i class="fas fa-dna"></i>
+                    </div>
+                    <div class="file-stats-badges">
+                        <span class="badge bg-danger">${file.mutation_count}</span>
+                        <span class="badge bg-secondary">${file.total_positions}</span>
+                    </div>
                 </div>
-                <div class="file-stats">
-                    <span class="badge bg-danger">${file.mutation_count}</span>
-                    <span class="badge bg-secondary">${file.total_positions}</span>
+                <div class="file-card-body">
+                    <h6 class="file-title">${file.original_filename}</h6>
+                    <div class="file-meta">
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>${file.upload_time}
+                        </small>
+                    </div>
+                    <div class="file-stats-text">
+                        <small class="text-muted">
+                            ${file.mutation_count} mutations • ${file.total_positions} positions
+                        </small>
+                    </div>
                 </div>
-                <div class="file-actions mt-2">
-                    <button class="btn btn-primary btn-sm view-table-btn" data-file-id="${file.id}">
+                <div class="file-card-footer">
+                    <button class="btn btn-primary w-100 view-table-btn" data-file-id="${file.id}">
                         <i class="fas fa-table me-1"></i>View Mutation Freq Table
                     </button>
                 </div>
             </div>
         `).join('');
         
-        historyList.innerHTML = historyHtml;
+        filesGrid.innerHTML = filesHtml;
         
         // Add event listeners for view table buttons
-        historyList.querySelectorAll('.view-table-btn').forEach(button => {
+        filesGrid.querySelectorAll('.view-table-btn').forEach(button => {
             button.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const fileId = button.getAttribute('data-file-id');
                 this.loadFileData(fileId);
-                
-                // Set the parent history item as active
-                const historyItem = button.closest('.history-item');
-                this.setActiveHistoryItem(historyItem);
             });
         });
     }
@@ -248,10 +265,9 @@ class MutationWorkspace {
         // Render data table
         this.renderDataTable(fileData.results);
 
-        // Hide welcome message and show table
-        document.getElementById('welcomeMessage').classList.add('d-none');
-        document.getElementById('tableContainer').classList.remove('d-none');
-        document.getElementById('positionsPanel').style.display = 'block';
+        // Show analysis section and hide files section
+        document.getElementById('filesSection').style.display = 'none';
+        document.getElementById('analysisSection').style.display = 'block';
     }
 
     renderPositions(mutatedPositions, lowConfPositions) {
@@ -457,12 +473,11 @@ class MutationWorkspace {
 
     resetView() {
         this.currentFileId = null;
-        document.getElementById('currentFileName').textContent = 'Select a FASTA file to view mutation analysis';
-        document.getElementById('fileInfo').textContent = '';
+        document.getElementById('currentFileName').textContent = 'Mutation Analysis Results';
+        document.getElementById('fileInfo').innerHTML = '';
         document.getElementById('downloadBtn').classList.add('d-none');
-        document.getElementById('positionsPanel').style.display = 'none';
-        document.getElementById('welcomeMessage').classList.remove('d-none');
-        document.getElementById('tableContainer').classList.add('d-none');
+        document.getElementById('filesSection').style.display = 'block';
+        document.getElementById('analysisSection').style.display = 'none';
         
         if (this.dataTable) {
             this.dataTable.destroy();
