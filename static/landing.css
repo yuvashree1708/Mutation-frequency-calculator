@@ -700,3 +700,102 @@ html, body {
 .chikv-passcode .btn-passcode:hover {
     box-shadow: 0 8px 25px rgba(25, 135, 84, 0.3);
 }
+
+/* Mobile responsiveness for landing page */
+@media (max-width: 768px) {
+    .workspace-card {
+        margin-bottom: 1rem;
+        padding: 1.5rem;
+    }
+    
+    .workspace-content h3 {
+        font-size: 1.3rem;
+    }
+    
+    .workspace-description {
+        font-size: 0.9rem;
+    }
+    
+    .feature-item {
+        font-size: 0.8rem;
+    }
+    
+    .main-title {
+        font-size: 2rem;
+    }
+    
+    .subtitle {
+        font-size: 1rem;
+    }
+    
+    .workspace-action .btn {
+        padding: 0.8rem 1.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .container {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .workspace-card {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .workspace-content h3 {
+        font-size: 1.2rem;
+    }
+    
+    .workspace-description {
+        font-size: 0.85rem;
+    }
+    
+    .workspace-features {
+        margin-top: 1rem;
+    }
+    
+    .feature-item {
+        font-size: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .main-title {
+        font-size: 1.8rem;
+    }
+    
+    .subtitle {
+        font-size: 0.9rem;
+        padding: 0 1rem;
+    }
+    
+    .platform-features .feature-card {
+        margin-bottom: 1rem;
+    }
+    
+    .workspace-action .btn {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.85rem;
+    }
+    
+    .logo-icon {
+        width: 80px;
+        height: 80px;
+        font-size: 2rem;
+    }
+    
+    .member-icon-top {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+    
+    .team-member {
+        padding: 1rem;
+    }
+    
+    .container {
+        padding: 0.5rem;
+    }
+}

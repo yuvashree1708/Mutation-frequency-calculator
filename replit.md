@@ -9,16 +9,18 @@ File upload preferences: Maximum file size support (3GB per file) for large geno
 Workspace storage: Keyword-based shared file access system for team collaboration.
 Access control: Limited to "DENV" and "CHIKV" keywords only for workspace access.
 File viewing: Each file requires "View Mutation Freq Table" button for viewing detailed mutation data.
+Device accessibility: Fully responsive design for mobile phones, tablets, laptops, and desktops.
 
 # System Architecture
 
 ## Frontend Architecture
 - **Template Engine**: Single-page dashboard template (workspace.html) with Bootstrap 5 dark theme
 - **JavaScript**: ES6 class-based MutationDashboard for managing file history, AJAX uploads, and dynamic table rendering
-- **UI Layout**: Two-panel design with collapsible sidebar for file history and main content area for interactive tables
+- **UI Layout**: Center-focused grid layout for file display with analysis view switching
 - **Data Tables**: DataTables.js with advanced features (search, pagination, scrolling, position jumping)
-- **Styling**: Custom responsive CSS with sidebar navigation, mutation position highlighting, and toast notifications
-- **File Actions**: Each file in history includes "View Mutation Freq Table" button for direct access to mutation data
+- **Styling**: Fully responsive CSS with mobile-first design, touch-friendly interfaces, and cross-device compatibility
+- **File Actions**: Each file displays as a card with "View Mutation Freq Table" button for direct access to mutation data
+- **Mobile Optimization**: Responsive grid layouts, touch-friendly buttons (44px+ touch targets), and optimized typography for all screen sizes
 
 ## Backend Architecture
 - **Web Framework**: Flask with RESTful API endpoints for AJAX communication and SQLAlchemy ORM
