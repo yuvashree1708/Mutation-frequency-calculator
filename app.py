@@ -179,16 +179,46 @@ def get_file_data(workspace_name, file_id):
     if not file_data:
         return jsonify({'error': 'File not found in session'}), 404
     
-    # Load results from JSON file
+    # Load results from file (supports both legacy pickle and new JSON formats)
     try:
         import json
+        import pickle
         results_path = os.path.join(app.config['UPLOAD_FOLDER'], file_data['results_file'])
         
         if not os.path.exists(results_path):
             return jsonify({'error': 'Results file not found on disk'}), 404
+        
+        # Check if it's a legacy pickle file or new JSON file
+        if file_data['results_file'].endswith('.pkl'):
+            # Legacy pickle file - load and convert to JSON
+            with open(results_path, 'rb') as f:
+                results = pickle.load(f)
             
-        with open(results_path, 'r') as f:
-            results = json.load(f)
+            # Convert to JSON format for future use
+            json_path = results_path.replace('.pkl', '.json')
+            with open(json_path, 'w') as f:
+                json.dump(results, f)
+            
+            # Update file_data to point to new JSON file
+            file_data['results_file'] = file_data['results_file'].replace('.pkl', '.json')
+            
+            # Update session to reference JSON file
+            session_key = f'{workspace_name}_history'
+            for entry in session[session_key]:
+                if entry['id'] == file_id:
+                    entry['results_file'] = file_data['results_file']
+                    break
+            session.modified = True
+            
+            # Clean up old pickle file
+            try:
+                os.remove(results_path)
+            except:
+                pass
+        else:
+            # New JSON file
+            with open(results_path, 'r') as f:
+                results = json.load(f)
             
         file_data['results'] = results
         
