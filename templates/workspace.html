@@ -184,6 +184,11 @@
         const workspace = '{{ workspace }}';
         const keyword = '{{ keyword }}';
     </script>
+    <script>
+        // Pass workspace to JavaScript
+        window.WORKSPACE = '{{ workspace }}';
+        console.log('Workspace set to:', window.WORKSPACE);
+    </script>
     <script src="{{ url_for('static', filename='workspace.js') }}"></script>
 </body>
 </html>

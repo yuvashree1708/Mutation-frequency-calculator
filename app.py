@@ -82,6 +82,7 @@ def workspace(workspace_name):
     # Store keyword in session for this workspace
     session[f'{workspace_name}_keyword'] = keyword
     session.permanent = True
+    logging.info(f"Keyword stored in session: {keyword} for workspace: {workspace_name}")
     
     # Load files from database for this keyword
     try:
@@ -108,13 +109,21 @@ def upload_file(workspace_name):
         logging.error(f"Invalid workspace: {workspace_name}")
         return jsonify({'error': 'Invalid workspace'}), 400
     
-    # Get keyword from session
+    # Get keyword from session or set default for workspace
     keyword = session.get(f'{workspace_name}_keyword')
     logging.info(f"Session keyword for {workspace_name}: {keyword}")
     
+    # If no keyword in session, use default based on workspace
     if not keyword:
-        logging.error(f"No keyword in session for workspace: {workspace_name}")
-        return jsonify({'error': 'No keyword found. Please refresh the page and enter a keyword.'}), 400
+        if workspace_name == 'denv':
+            keyword = 'DENV'
+        elif workspace_name == 'chikv':
+            keyword = 'CHIKV'
+        
+        # Store the keyword in session
+        session[f'{workspace_name}_keyword'] = keyword
+        session.permanent = True
+        logging.info(f"Set default keyword for {workspace_name}: {keyword}")
         
     if 'file' not in request.files:
         logging.error("No file in request")

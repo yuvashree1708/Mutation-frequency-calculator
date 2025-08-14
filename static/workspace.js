@@ -174,7 +174,11 @@ class MutationWorkspace {
             this.updateUploadStatus('Upload timed out');
         };
 
-        xhr.open('POST', `/upload/${this.workspace}`);
+        // Use window.WORKSPACE to ensure correct workspace
+        const currentWorkspace = window.WORKSPACE || window.location.pathname.split('/')[2] || this.workspace;
+        console.log('Uploading to workspace:', currentWorkspace);
+        
+        xhr.open('POST', `/upload/${currentWorkspace}`);
         xhr.send(formData);
     }
 
