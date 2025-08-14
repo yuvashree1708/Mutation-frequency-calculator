@@ -81,6 +81,7 @@ def analyze_mutations(filepath, include_gaps=False):
                 mutation_strs = [f"{ref_res}{position_number}{res}({pct}%)" 
                                  for res, pct in mutation_freqs.items()]
                 representation = ",".join(mutation_strs)
+                logging.debug(f"Position {position_number}: New format representation = {representation}")
             
             results.append({
                 "Position": i + 1,
