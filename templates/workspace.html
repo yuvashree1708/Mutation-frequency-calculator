@@ -190,5 +190,11 @@
         console.log('Workspace set to:', window.WORKSPACE);
     </script>
     <script src="{{ url_for('static', filename='workspace.js') }}"></script>
+    <script>
+        // Initialize the dashboard when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            window.dashboard = new MutationDashboard(window.WORKSPACE);
+        });
+    </script>
 </body>
 </html>

@@ -314,20 +314,20 @@ class MutationWorkspace {
         const mutatedContainer = document.getElementById('mutatedPositions');
         const lowConfContainer = document.getElementById('lowConfPositions');
 
-        // Render mutated positions
+        // Render mutated positions with click handlers
         if (mutatedPositions.length > 0) {
             const mutatedHtml = mutatedPositions.map(pos => 
-                `<button class="position-badge" title="Jump to position ${pos}" data-position="${pos}">${pos}</button>`
+                `<button class="position-badge" title="Click to highlight position ${pos}" data-position="${pos}" onclick="window.dashboard.highlightTablePosition(${pos})">${pos}</button>`
             ).join('');
             mutatedContainer.innerHTML = mutatedHtml;
         } else {
             mutatedContainer.innerHTML = '<span class="text-muted small">No mutations detected</span>';
         }
 
-        // Render low confidence positions
+        // Render low confidence positions with click handlers
         if (lowConfPositions.length > 0) {
             const lowConfHtml = lowConfPositions.map(pos => 
-                `<button class="position-badge low-conf" title="Jump to position ${pos}" data-position="${pos}">${pos}</button>`
+                `<button class="position-badge low-conf" title="Click to highlight position ${pos}" data-position="${pos}" onclick="window.dashboard.highlightTablePosition(${pos})">${pos}</button>`
             ).join('');
             lowConfContainer.innerHTML = lowConfHtml;
         } else {
@@ -435,14 +435,6 @@ class MutationWorkspace {
     }
     
     addTableInteractions() {
-        // Position badge click handlers
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('position-badge')) {
-                const position = parseInt(e.target.getAttribute('data-position'));
-                this.scrollToPosition(position);
-            }
-        });
-        
         // Table row click highlighting
         $(document).on('click', '#dataTable tbody tr', (e) => {
             const $row = $(e.currentTarget);
@@ -462,6 +454,54 @@ class MutationWorkspace {
                 $row.removeClass('highlighted-row');
             }, 5000);
         });
+    }
+    
+    highlightTablePosition(position) {
+        if (!this.dataTable) {
+            this.showToast('Error', 'Table not loaded yet', 'warning');
+            return;
+        }
+
+        // Clear any existing search to show all rows
+        this.dataTable.search('').draw();
+        
+        // Find the correct page for this position
+        const pageSize = this.dataTable.page.len();
+        const targetPage = Math.floor((position - 1) / pageSize);
+        
+        // Go to the correct page
+        this.dataTable.page(targetPage).draw(false);
+        
+        // Small delay to ensure page is rendered
+        setTimeout(() => {
+            // Find and highlight the target row
+            const targetRow = document.querySelector(`#dataTable tbody tr[data-position="${position}"]`);
+            if (targetRow) {
+                // Remove previous highlights
+                document.querySelectorAll('#dataTable tbody tr').forEach(row => {
+                    row.classList.remove('highlighted-row');
+                });
+                
+                // Add highlight to target row
+                targetRow.classList.add('highlighted-row');
+                
+                // Scroll to the row smoothly
+                targetRow.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+                
+                // Show success toast
+                this.showToast('Position Highlighted', `Position ${position} is now highlighted in the table`, 'success');
+                
+                // Auto-remove highlight after 8 seconds
+                setTimeout(() => {
+                    targetRow.classList.remove('highlighted-row');
+                }, 8000);
+            } else {
+                this.showToast('Position Not Found', `Position ${position} could not be found in the table`, 'warning');
+            }
+        }, 100);
     }
 
     styleDataTable() {
