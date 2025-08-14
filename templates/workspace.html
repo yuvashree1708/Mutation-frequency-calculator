@@ -42,15 +42,17 @@
                     <div class="upload-section p-3 border-bottom">
                         <label for="fileInput" class="btn btn-primary w-100 mb-2">
                             <i class="fas fa-upload me-2"></i>
-                            Upload FASTA
+                            Upload Genomic Files (up to 500MB)
                         </label>
-                        <input type="file" id="fileInput" class="d-none" accept=".fasta,.fa">
+                        <input type="file" id="fileInput" class="d-none" accept=".fasta,.fa,.txt,.csv,.fas,.aln,.seq,.msa,.phylip,.phy,.nex,.nexus" multiple>
                         
                         <div id="uploadProgress" class="progress d-none mb-2" style="height: 3px;">
                             <div class="progress-bar" role="progressbar" style="width: 0%"></div>
                         </div>
                         
-                        <div id="uploadStatus" class="small text-muted"></div>
+                        <div id="uploadStatus" class="small text-muted">
+                            Supports: FASTA, TXT, CSV, ALN, SEQ, MSA, PHYLIP, NEX and more
+                        </div>
                     </div>
 
                     <!-- History Section -->
@@ -97,7 +99,7 @@
                     <div class="content-header border-bottom p-3">
                         <div class="row align-items-center">
                             <div class="col">
-                                <h4 class="mb-0" id="currentFileName">Select a FASTA file to view mutation analysis</h4>
+                                <h4 class="mb-0" id="currentFileName">Select a genomic alignment file to view mutation analysis</h4>
                                 <div id="fileInfo" class="text-muted small mt-1"></div>
                             </div>
                             <div class="col-auto">
@@ -143,9 +145,9 @@
                                 Welcome to {{ workspace.upper() }} Workspace
                             </h5>
                             <p class="text-muted">
-                                Upload a FASTA file to analyze 
+                                Upload genomic alignment files (up to 500MB) to analyze 
                                 {% if workspace == 'denv' %}dengue virus{% else %}chikungunya virus{% endif %}
-                                mutation frequencies
+                                mutation frequencies. Supports FASTA, TXT, CSV, ALN, SEQ, MSA, PHYLIP, NEX and many other formats.
                             </p>
                             <div class="welcome-features mt-4">
                                 <div class="row justify-content-center g-3">

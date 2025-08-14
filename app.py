@@ -18,8 +18,8 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 # Configuration
 UPLOAD_FOLDER = 'uploads'
-ALLOWED_EXTENSIONS = {'fasta', 'fa', 'txt', 'csv'}  # Support multiple alignment formats
-MAX_FILE_SIZE = 100 * 1024 * 1024  # 100MB for large genomic files
+ALLOWED_EXTENSIONS = {'fasta', 'fa', 'txt', 'csv', 'fas', 'aln', 'seq', 'msa', 'phylip', 'phy', 'nex', 'nexus'}  # Support extensive alignment formats
+MAX_FILE_SIZE = 500 * 1024 * 1024  # 500MB for very large genomic datasets
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
@@ -66,7 +66,7 @@ def upload_file(workspace_name):
         return jsonify({'error': 'No file selected'}), 400
     
     if not allowed_file(file.filename):
-        return jsonify({'error': 'Invalid file format. Please upload FASTA, FA, TXT, or CSV files only.'}), 400
+        return jsonify({'error': 'Invalid file format. Supported formats: FASTA, FA, TXT, CSV, FAS, ALN, SEQ, MSA, PHYLIP, PHY, NEX, NEXUS'}), 400
     
     try:
         # Generate unique file ID and save uploaded file
@@ -135,8 +135,11 @@ def upload_file(workspace_name):
     except Exception as e:
         logging.error(f"Error processing file: {str(e)}")
         # Clean up on error
-        if 'filepath' in locals() and os.path.exists(filepath):
-            os.remove(filepath)
+        try:
+            if 'filepath' in locals() and filepath and os.path.exists(filepath):
+                os.remove(filepath)
+        except Exception:
+            pass  # Ignore cleanup errors
         return jsonify({'error': f'Error processing file: {str(e)}'}), 500
 
 @app.route('/download/<filename>')
