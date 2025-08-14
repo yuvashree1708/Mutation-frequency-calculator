@@ -256,7 +256,11 @@ class MutationWorkspace {
         
         this.showLoadingSpinner();
         
-        fetch(`/api/${this.workspace}/file/${fileId}`)
+        // Use window.WORKSPACE to ensure correct workspace
+        const workspace = window.WORKSPACE || this.workspace;
+        console.log('Loading file data for:', fileId, 'workspace:', workspace);
+        
+        fetch(`/api/${workspace}/file/${fileId}`)
         .then(response => {
             if (response.ok) {
                 return response.json();

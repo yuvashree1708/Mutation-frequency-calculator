@@ -237,10 +237,12 @@ def get_file_data(workspace_name, file_id):
     if workspace_name not in ['denv', 'chikv']:
         return jsonify({'error': 'Invalid workspace'}), 400
     
-    # Get keyword from session
+    # Get keyword from session or set default
     keyword = session.get(f'{workspace_name}_keyword')
     if not keyword:
-        return jsonify({'error': 'No keyword found. Please refresh the page.'}), 400
+        keyword = 'DENV' if workspace_name == 'denv' else 'CHIKV'
+        session[f'{workspace_name}_keyword'] = keyword
+        logging.info(f"Set default keyword for {workspace_name}: {keyword}")
     
     # Load file from database with keyword check
     try:
