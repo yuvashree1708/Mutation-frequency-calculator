@@ -1,6 +1,6 @@
 # Overview
 
-This is a bioinformatics web application for analyzing mutation frequencies in DNA/protein sequence alignments. The application allows researchers to upload sequence alignment files (FASTA, TXT, CSV formats) and generates detailed mutation analysis reports with visual dashboards. It identifies conserved positions versus positions with mutations, calculates frequency percentages for each variant, and provides downloadable CSV results.
+This is an interactive bioinformatics web dashboard for analyzing mutation frequencies in DNA/protein sequence alignments. The application features a sidebar-based interface where users can upload sequence files (FASTA, TXT, CSV formats) and maintain a session-based history of analyzed files. The main content area displays interactive, scrollable tables with mutation analysis results, and highlights specific mutation positions rather than traditional statistical summaries.
 
 # User Preferences
 
@@ -9,16 +9,18 @@ Preferred communication style: Simple, everyday language.
 # System Architecture
 
 ## Frontend Architecture
-- **Template Engine**: Jinja2 templates with Bootstrap 5 dark theme for responsive UI
-- **JavaScript**: Vanilla JavaScript for form validation, file upload handling, and interactive features
-- **Data Tables**: DataTables.js for sortable, searchable results display
-- **Styling**: Custom CSS with Bootstrap components, Font Awesome icons, and mutation-specific color coding
+- **Template Engine**: Single-page dashboard template (dashboard.html) with Bootstrap 5 dark theme
+- **JavaScript**: ES6 class-based MutationDashboard for managing file history, AJAX uploads, and dynamic table rendering
+- **UI Layout**: Two-panel design with collapsible sidebar for file history and main content area for interactive tables
+- **Data Tables**: DataTables.js with advanced features (search, pagination, scrolling, position jumping)
+- **Styling**: Custom responsive CSS with sidebar navigation, mutation position highlighting, and toast notifications
 
 ## Backend Architecture
-- **Web Framework**: Flask with Werkzeug utilities for file handling and proxy support
-- **File Processing**: Secure file upload with extension validation and size limits (16MB max)
-- **Session Management**: Flask sessions with configurable secret key
-- **Logging**: Python logging module for debugging and monitoring
+- **Web Framework**: Flask with RESTful API endpoints for AJAX communication
+- **File Processing**: AJAX-based file upload with unique file ID generation and temporary storage
+- **Session Management**: Flask sessions storing file history with metadata (filename, timestamps, results, mutation positions)
+- **API Endpoints**: /api/file/<id>, /api/history, /api/clear-history for dynamic data management
+- **Logging**: Python logging module with detailed debugging for file processing and session management
 
 ## Data Processing Engine
 - **Bioinformatics Library**: BioPython for sequence alignment parsing and analysis
@@ -27,9 +29,10 @@ Preferred communication style: Simple, everyday language.
 - **Output Generation**: CSV export functionality with detailed mutation statistics
 
 ## File Storage Strategy
-- **Upload Directory**: Local filesystem storage in 'uploads' folder
-- **Temporary Processing**: Python tempfile module for secure temporary file handling
-- **Result Files**: Generated CSV files stored temporarily for download
+- **Session-Based History**: File results stored in Flask sessions with 10-file limit (newest first)
+- **Temporary Processing**: Unique file ID system for secure processing and immediate cleanup
+- **In-Memory Storage**: Complete analysis results stored in session for instant retrieval without re-processing
+- **CSV Export**: Generated CSV files available through download endpoints tied to session data
 
 ## Security Features
 - **File Validation**: Whitelist-based file extension checking and secure filename generation
@@ -44,9 +47,10 @@ Preferred communication style: Simple, everyday language.
 - **Werkzeug**: WSGI utilities and security features
 
 ## Frontend Dependencies
-- **Bootstrap 5**: UI framework with dark theme variant
-- **Font Awesome 6**: Icon library for visual enhancements
-- **DataTables.js**: Advanced table functionality for results display
+- **Bootstrap 5**: UI framework with dark theme variant and toast notification system
+- **Font Awesome 6**: Icon library for navigation, status indicators, and interactive elements
+- **DataTables.js**: Advanced table functionality with scrolling, search, and position navigation
+- **jQuery**: Required for DataTables and DOM manipulation
 
 ## Python Standard Library
 - **logging**: Application monitoring and debugging
