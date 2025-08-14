@@ -352,6 +352,55 @@ html, body {
     margin-top: 5rem;
 }
 
+/* Team Attribution */
+.team-attribution {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.team-member {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.team-member:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(var(--bs-primary-rgb), 0.3);
+}
+
+.member-icon {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 1rem;
+    background: linear-gradient(135deg, var(--bs-primary), var(--bs-info));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: white;
+}
+
+.team-member h6 {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--bs-body-color);
+    font-size: 1rem;
+}
+
+.team-member small {
+    color: var(--bs-secondary);
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
 .feature-card {
     text-align: center;
     padding: 1.5rem;
