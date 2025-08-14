@@ -1,0 +1,81 @@
+from Bio import AlignIO
+from collections import Counter
+import csv
+from google.colab import files
+
+# Upload alignment
+uploaded = files.upload()
+filename = list(uploaded.keys())[0]
+
+# Read alignment
+alignment = AlignIO.read(filename, "fasta")
+num_positions = alignment.get_alignment_length()
+
+# Pick reference sequence (first sequence in alignment here)
+reference_seq = alignment[0].seq
+
+# Parameters
+include_gaps = False  # Do not count gaps in denominator for % calculation
+
+results = []
+
+for i in range(num_positions):
+    column = alignment[:, i]  # Residues at position i across all sequences
+    counts = Counter(column)
+    
+    # Remove gaps if not counting them
+    if not include_gaps:
+        counts.pop("-", None)
+    
+    # Check for ambiguity
+    has_ambiguity = "X" in counts
+    
+    # Sequences to consider for % calculation (exclude ambiguities)
+    total_non_ambig = sum(v for k, v in counts.items() if k != "X")
+    
+    # Calculate percentages
+    if total_non_ambig > 0:
+        freq_percent = {res: round((count / total_non_ambig) * 100, 2)
+                        for res, count in counts.items() if res != "X"}
+    else:
+        freq_percent = {}
+    
+    ref_res = reference_seq[i]
+    
+    # Determine mutation representation
+    if len(freq_percent) == 1 and ref_res in freq_percent:
+        mutation_status = "Green"  # No mutation, fully conserved
+        representation = f"{ref_res} (100%)"
+    else:
+        mutation_status = "Red"  # Has mutation(s)
+        # Exclude reference residue from mutation % representation
+        mutation_freqs = {res: pct for res, pct in freq_percent.items() if res != ref_res}
+        # Format mutation representation
+        if mutation_freqs:
+            mutation_strs = [f"{res} ({pct}%)" for res, pct in mutation_freqs.items()]
+            representation = "; ".join(mutation_strs)
+        else:
+            representation = f"{ref_res} (100%)"
+    
+    results.append({
+        "Position": i + 1,
+        "Reference": ref_res,
+        "Counts": dict(counts),
+        "Frequencies (%)": freq_percent,
+        "Ambiguity": "Low-confidence" if has_ambiguity else "High-confidence",
+        "Mutation Representation": representation,
+        "Color": mutation_status
+    })
+
+# Save to CSV
+output_file = "position_variation_with_ambiguity.csv"
+with open(output_file, "w", newline="") as csvfile:
+    fieldnames = ["Position", "Reference", "Counts", "Frequencies (%)", "Ambiguity", "Mutation Representation", "Color"]
+    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    writer.writeheader()
+    for row in results:
+        writer.writerow(row)
+
+files.download(output_file)
+
+print(f"CSV file saved: {output_file}")
