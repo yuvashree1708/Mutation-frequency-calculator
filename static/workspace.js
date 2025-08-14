@@ -127,24 +127,45 @@ class MutationWorkspace {
             if (e.lengthComputable) {
                 const percentComplete = (e.loaded / e.total) * 100;
                 this.updateUploadProgress(percentComplete);
-                this.updateUploadStatus(`Uploading... ${percentComplete.toFixed(1)}%`);
+                if (percentComplete < 100) {
+                    this.updateUploadStatus(`Uploading... ${percentComplete.toFixed(1)}%`);
+                } else {
+                    this.updateUploadStatus('Upload complete! Processing mutations...');
+                }
             }
         });
 
         xhr.onload = () => {
             if (xhr.status === 200) {
                 const data = JSON.parse(xhr.responseText);
-                this.hideUploadProgress();
                 
                 if (data.success) {
-                    this.showToast('Success', data.message, 'success');
+                    this.updateUploadStatus('Processing complete! Loading results...');
+                    this.hideUploadProgress();
+                    
+                    // Show immediate statistics if available
+                    if (data.immediate_data) {
+                        const stats = data.immediate_data;
+                        this.showToast('Success', 
+                            `${data.message} Processing: ${stats.processing_time}`, 
+                            'success'
+                        );
+                    } else {
+                        this.showToast('Success', data.message, 'success');
+                    }
+                    
                     this.updateUploadStatus('');
-                    this.loadHistory(); // Refresh history
-                    this.loadFileData(data.file_id); // Load the new file
+                    
+                    // Immediately load and display the file data
+                    this.loadFileData(data.file_id).then(() => {
+                        // After loading data, refresh history
+                        this.loadHistory();
+                    });
                     
                     // Clear file input
                     document.getElementById('fileInput').value = '';
                 } else {
+                    this.hideUploadProgress();
                     this.showToast('Error', data.error, 'danger');
                     this.updateUploadStatus('Upload failed');
                 }
@@ -161,7 +182,7 @@ class MutationWorkspace {
             this.updateUploadStatus('Upload failed');
         };
 
-        xhr.timeout = 300000; // 5 minutes timeout for large files
+        xhr.timeout = 180000; // 3 minutes timeout - optimized processing
         xhr.ontimeout = () => {
             this.hideUploadProgress();
             this.showToast('Error', 'Upload timed out. File may be too large.', 'danger');
@@ -543,10 +564,13 @@ class MutationWorkspace {
     }
 
     updateUploadProgress(percentage) {
-        const progressBar = document.querySelector('#upload-progress .progress-bar');
-        if (progressBar) {
-            progressBar.style.width = `${percentage}%`;
-            progressBar.setAttribute('aria-valuenow', percentage);
+        const progressContainer = document.getElementById('upload-progress');
+        if (progressContainer) {
+            const progressBar = progressContainer.querySelector('.progress-bar');
+            if (progressBar) {
+                progressBar.style.width = `${percentage}%`;
+                progressBar.setAttribute('aria-valuenow', percentage);
+            }
         }
     }
 

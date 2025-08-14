@@ -47,14 +47,17 @@ def analyze_mutations(filepath, include_gaps=False):
         
         results = []
         
-        # Process in chunks for large files to optimize memory usage
-        chunk_size = min(1000, num_positions) if file_size_mb > 10 else num_positions
-        if chunk_size < num_positions:
-            logging.info(f"Processing large file in chunks of {chunk_size} positions")
+        # Fast processing mode for small files, chunked for large files
+        if file_size_mb <= 5:  # Fast mode for files under 5MB
+            chunk_size = num_positions
+            logging.info(f"Fast processing mode: analyzing all {num_positions} positions")
+        else:  # Chunked mode for larger files
+            chunk_size = min(500, num_positions)  # Smaller chunks for faster feedback
+            logging.info(f"Chunked processing: {chunk_size} positions per chunk for {file_size_mb:.1f}MB file")
         
         for i in range(num_positions):
-            if i % chunk_size == 0:
-                logging.debug(f"Processing position {i + 1}/{num_positions} ({((i + 1) / num_positions * 100):.1f}%)")
+            if i % chunk_size == 0 and chunk_size < num_positions:
+                logging.info(f"Processing position {i + 1}/{num_positions} ({((i + 1) / num_positions * 100):.1f}%)")
             
             column = alignment[:, i]  # Residues at position i across all sequences
             counts = Counter(column)
@@ -103,17 +106,26 @@ def analyze_mutations(filepath, include_gaps=False):
                 "Color": mutation_status
             })
         
-        # Save to CSV
+        # Save to CSV with optimized writing
         output_filename = f"mutation_analysis_results.csv"
         output_filepath = os.path.join("uploads", output_filename)
         
-        with open(output_filepath, "w", newline="") as csvfile:
+        logging.info(f"Writing {len(results)} results to CSV...")
+        
+        with open(output_filepath, "w", newline="", encoding='utf-8', buffering=8192) as csvfile:
             fieldnames = ["Position", "Reference", "Counts", "Frequencies (%)", 
                          "Ambiguity", "Mutation Representation", "Color"]
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
-            for row in results:
-                writer.writerow(row)
+            
+            # Write in batches for large files
+            batch_size = 1000
+            for i in range(0, len(results), batch_size):
+                batch = results[i:i + batch_size]
+                for row in batch:
+                    writer.writerow(row)
+                if i + batch_size < len(results) and len(results) > 5000:
+                    logging.debug(f"Written {i + batch_size}/{len(results)} results to CSV")
         
         logging.debug(f"Analysis complete. Results saved to {output_filepath}")
         return results, output_filename
