@@ -36,6 +36,13 @@
                                 Chikungunya Virus Analysis
                             {% endif %}
                         </small>
+                        {% if access_mode == 'team' %}
+                        <div class="access-mode-indicator mt-2">
+                            <span class="badge bg-success">
+                                <i class="fas fa-users me-1"></i>Team Access Mode
+                            </span>
+                        </div>
+                        {% endif %}
                     </div>
 
                     <!-- Upload Section -->

@@ -43,14 +43,26 @@ def workspace(workspace_name):
     if workspace_name not in ['denv', 'chikv']:
         return redirect(url_for('index'))
     
-    # Initialize workspace-specific session history
-    session_key = f'{workspace_name}_history'
-    if session_key not in session:
-        session[session_key] = []
+    # Check if this is team access mode
+    team_access = request.args.get('team_access') == 'true'
+    
+    if team_access:
+        # For team access, load shared files from a global session key
+        shared_session_key = f'{workspace_name}_shared_files'
+        history = session.get(shared_session_key, [])
+        access_mode = 'team'
+    else:
+        # Regular user access - use individual session
+        session_key = f'{workspace_name}_history'
+        if session_key not in session:
+            session[session_key] = []
+        history = session.get(session_key, [])
+        access_mode = 'individual'
     
     return render_template('workspace.html', 
                          workspace=workspace_name, 
-                         history=session.get(session_key, []))
+                         history=history,
+                         access_mode=access_mode)
 
 @app.route('/upload/<workspace_name>', methods=['POST'])
 def upload_file(workspace_name):
@@ -119,6 +131,17 @@ def upload_file(workspace_name):
         
         # Keep only last 25 files per workspace (expanded for 3GB storage capacity)
         session[session_key] = session[session_key][:25]
+        
+        # Also store in shared session for team access
+        shared_session_key = f'{workspace_name}_shared_files'
+        if shared_session_key not in session:
+            session[shared_session_key] = []
+        
+        # Add to shared session (newest first)
+        session[shared_session_key].insert(0, file_entry)
+        
+        # Keep only last 25 files per workspace in shared session
+        session[shared_session_key] = session[shared_session_key][:25]
         session.modified = True
         
         logging.debug(f"File processed: {filename}, mutations at positions: {mutated_positions[:10]}...")
@@ -164,8 +187,15 @@ def get_file_data(workspace_name, file_id):
     """Get file data for display in the main table."""
     if workspace_name not in ['denv', 'chikv']:
         return jsonify({'error': 'Invalid workspace'}), 400
+    
+    # Check if this is team access mode
+    team_access = request.args.get('team_access') == 'true'
+    
+    if team_access:
+        session_key = f'{workspace_name}_shared_files'
+    else:
+        session_key = f'{workspace_name}_history'
         
-    session_key = f'{workspace_name}_history'
     if session_key not in session:
         return jsonify({'error': 'No files in history'}), 404
     
@@ -236,8 +266,15 @@ def get_history(workspace_name):
     """Get current workspace file history."""
     if workspace_name not in ['denv', 'chikv']:
         return jsonify({'error': 'Invalid workspace'}), 400
+    
+    # Check if this is team access mode
+    team_access = request.args.get('team_access') == 'true'
+    
+    if team_access:
+        session_key = f'{workspace_name}_shared_files'
+    else:
+        session_key = f'{workspace_name}_history'
         
-    session_key = f'{workspace_name}_history'
     return jsonify({
         'success': True,
         'history': session.get(session_key, [])

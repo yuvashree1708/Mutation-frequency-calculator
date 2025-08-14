@@ -205,3 +205,86 @@ const scrollHandler = throttle(function() {
 }, 16); // ~60fps
 
 window.addEventListener('scroll', scrollHandler);
+
+// Passcode access functionality
+function accessWorkspace(workspace, passcode) {
+    const validPasscodes = {
+        'denv': 'DENV',
+        'chikv': 'CHIKV'
+    };
+    
+    if (!passcode) {
+        showPasscodeMessage('Please enter a passcode', 'error');
+        return;
+    }
+    
+    if (validPasscodes[workspace] === passcode.toUpperCase()) {
+        showPasscodeMessage('Access granted! Redirecting...', 'success');
+        setTimeout(() => {
+            window.location.href = `/workspace/${workspace}?team_access=true`;
+        }, 1000);
+    } else {
+        showPasscodeMessage('Invalid passcode. Please try again.', 'error');
+        // Clear the input
+        document.getElementById(`${workspace}Passcode`).value = '';
+    }
+}
+
+// Show passcode message function
+function showPasscodeMessage(message, type) {
+    // Remove any existing message
+    const existingMessage = document.querySelector('.passcode-message');
+    if (existingMessage) {
+        existingMessage.remove();
+    }
+    
+    // Create new message element
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `passcode-message alert ${type === 'success' ? 'alert-success' : 'alert-danger'}`;
+    messageDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s ease;
+    `;
+    messageDiv.innerHTML = `
+        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i>
+        ${message}
+    `;
+    
+    document.body.appendChild(messageDiv);
+    
+    // Animate in
+    setTimeout(() => {
+        messageDiv.style.opacity = '1';
+        messageDiv.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        messageDiv.style.opacity = '0';
+        messageDiv.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (messageDiv.parentNode) {
+                messageDiv.parentNode.removeChild(messageDiv);
+            }
+        }, 300);
+    }, 3000);
+}
+
+// Allow Enter key to submit passcode
+document.addEventListener('DOMContentLoaded', function() {
+    const passcodeInputs = document.querySelectorAll('.passcode-input');
+    passcodeInputs.forEach(input => {
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const workspace = this.id.replace('Passcode', '');
+                accessWorkspace(workspace, this.value);
+            }
+        });
+    });
+});

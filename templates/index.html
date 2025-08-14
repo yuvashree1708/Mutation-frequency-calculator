@@ -79,6 +79,44 @@
                         </p>
                     </div>
 
+                    <!-- Team Access Section -->
+                    <div class="team-access-section mb-5">
+                        <div class="text-center mb-4">
+                            <h4 class="team-access-title">Team Access</h4>
+                            <p class="team-access-subtitle">Enter workspace passcode to access shared analysis data</p>
+                        </div>
+                        <div class="row g-3 justify-content-center">
+                            <div class="col-lg-4 col-md-6">
+                                <div class="passcode-card denv-passcode">
+                                    <div class="passcode-header">
+                                        <i class="fas fa-key"></i>
+                                        <h6>DENV Access</h6>
+                                    </div>
+                                    <div class="passcode-input-group">
+                                        <input type="password" id="denvPasscode" class="form-control passcode-input" placeholder="Enter DENV passcode" maxlength="10">
+                                        <button class="btn btn-passcode" onclick="accessWorkspace('denv', document.getElementById('denvPasscode').value)">
+                                            <i class="fas fa-unlock"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <div class="passcode-card chikv-passcode">
+                                    <div class="passcode-header">
+                                        <i class="fas fa-key"></i>
+                                        <h6>CHIKV Access</h6>
+                                    </div>
+                                    <div class="passcode-input-group">
+                                        <input type="password" id="chikvPasscode" class="form-control passcode-input" placeholder="Enter CHIKV passcode" maxlength="10">
+                                        <button class="btn btn-passcode" onclick="accessWorkspace('chikv', document.getElementById('chikvPasscode').value)">
+                                            <i class="fas fa-unlock"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Workspace Selection -->
                     <div class="workspace-selection">
                         <div class="row g-4 justify-content-center">

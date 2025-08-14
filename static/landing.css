@@ -580,3 +580,123 @@ html, body {
 ::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(135deg, var(--bs-info), var(--bs-primary));
 }
+
+/* Team Access Section */
+.team-access-section {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 3rem;
+}
+
+.team-access-title {
+    font-weight: 600;
+    color: var(--bs-body-color);
+    margin-bottom: 0.5rem;
+}
+
+.team-access-subtitle {
+    color: var(--bs-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 0;
+}
+
+.passcode-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.passcode-card:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(var(--bs-primary-rgb), 0.3);
+}
+
+.denv-passcode:hover {
+    border-color: rgba(220, 53, 69, 0.5);
+}
+
+.chikv-passcode:hover {
+    border-color: rgba(25, 135, 84, 0.5);
+}
+
+.passcode-header {
+    margin-bottom: 1rem;
+}
+
+.passcode-header i {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--bs-primary);
+}
+
+.denv-passcode .passcode-header i {
+    color: #dc3545;
+}
+
+.chikv-passcode .passcode-header i {
+    color: #198754;
+}
+
+.passcode-header h6 {
+    font-weight: 600;
+    margin: 0;
+    color: var(--bs-body-color);
+}
+
+.passcode-input-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.passcode-input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--bs-body-color);
+    font-size: 0.9rem;
+    padding: 0.7rem;
+    border-radius: 8px;
+}
+
+.passcode-input:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--bs-primary);
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.btn-passcode {
+    background: linear-gradient(135deg, var(--bs-primary), var(--bs-info));
+    border: none;
+    color: white;
+    padding: 0.7rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.denv-passcode .btn-passcode {
+    background: linear-gradient(135deg, #dc3545, #fd7e14);
+}
+
+.chikv-passcode .btn-passcode {
+    background: linear-gradient(135deg, #198754, #20c997);
+}
+
+.btn-passcode:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(var(--bs-primary-rgb), 0.3);
+}
+
+.denv-passcode .btn-passcode:hover {
+    box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
+}
+
+.chikv-passcode .btn-passcode:hover {
+    box-shadow: 0 8px 25px rgba(25, 135, 84, 0.3);
+}
