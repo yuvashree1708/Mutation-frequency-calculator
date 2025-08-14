@@ -130,6 +130,11 @@ class MutationWorkspace {
                 this.updateUploadStatus(`Uploading... ${percentComplete.toFixed(1)}%`);
             }
         });
+        
+        // Handle upload start
+        xhr.addEventListener('loadstart', () => {
+            this.updateUploadStatus('Starting upload...');
+        });
 
         xhr.onload = () => {
             if (xhr.status === 200) {

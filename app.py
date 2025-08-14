@@ -102,22 +102,34 @@ def workspace(workspace_name):
 @app.route('/upload/<workspace_name>', methods=['POST'])
 def upload_file(workspace_name):
     """Handle file upload and process mutation analysis via AJAX."""
+    logging.info(f"Upload request received for workspace: {workspace_name}")
+    
     if workspace_name not in ['denv', 'chikv']:
+        logging.error(f"Invalid workspace: {workspace_name}")
         return jsonify({'error': 'Invalid workspace'}), 400
     
     # Get keyword from session
     keyword = session.get(f'{workspace_name}_keyword')
+    logging.info(f"Session keyword for {workspace_name}: {keyword}")
+    
     if not keyword:
+        logging.error(f"No keyword in session for workspace: {workspace_name}")
         return jsonify({'error': 'No keyword found. Please refresh the page and enter a keyword.'}), 400
         
     if 'file' not in request.files:
+        logging.error("No file in request")
         return jsonify({'error': 'No file selected'}), 400
     
     file = request.files['file']
     if file.filename == '':
+        logging.error("Empty filename")
         return jsonify({'error': 'No file selected'}), 400
     
+    logging.info(f"Processing file: {file.filename}, size: {len(file.read())} bytes")
+    file.seek(0)  # Reset file pointer after reading size
+    
     if not allowed_file(file.filename):
+        logging.error(f"Invalid file format: {file.filename}")
         return jsonify({'error': 'Invalid file format. Supported formats: FASTA, FA, TXT, CSV, FAS, ALN, SEQ, MSA, PHYLIP, PHY, NEX, NEXUS'}), 400
     
     filepath = None
@@ -164,27 +176,22 @@ def upload_file(workspace_name):
         new_file.mutated_positions = json.dumps(mutated_positions)
         new_file.low_conf_positions = json.dumps(low_conf_positions)
         
-        try:
-            db.session.add(new_file)
-            db.session.commit()
-            logging.info(f"File saved to database: {filename} (ID: {file_id})")
-        except Exception as db_error:
-            logging.error(f"Error saving file to database: {str(db_error)}")
-            db.session.rollback()
-            raise Exception(f"Failed to save file information: {str(db_error)}")
+        # Don't commit yet - add file path first
+        db.session.add(new_file)
         
         logging.debug(f"File processed: {filename}, mutations at positions: {mutated_positions[:10]}...")
         
-        # Store original uploaded file permanently - update database with permanent path
-        permanent_filepath = filepath  # Already using permanent filename
+        # Store the uploaded file path in database
         new_file.uploaded_file_path = permanent_filename
         
+        # Update the database with file path before committing
         try:
-            db.session.commit()  # Update database with file path
-            logging.info(f"File permanently stored: {permanent_filename}")
+            db.session.commit()
+            logging.info(f"File permanently stored and database updated: {permanent_filename}")
         except Exception as db_error:
-            logging.error(f"Error updating file path in database: {str(db_error)}")
+            logging.error(f"Error updating database with file path: {str(db_error)}")
             db.session.rollback()
+            raise Exception(f"Failed to update file path in database: {str(db_error)}")
         
         return jsonify({
             'success': True,
