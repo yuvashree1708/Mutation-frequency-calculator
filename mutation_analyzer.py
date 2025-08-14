@@ -97,11 +97,22 @@ def analyze_mutations(filepath, include_gaps=False):
                 if ref_freq > 0:
                     representation_parts.append(f"{ref_res} ({ref_freq}%)")
                 
-                # Add each mutation clearly formatted with position
+                # Add each mutation clearly formatted: RefPos+Mutated (frequency)
+                mutation_parts = []
                 for res, pct in sorted(mutation_freqs.items()):
-                    representation_parts.append(f"{ref_res}{position_number}{res} ({pct}%)")
+                    mutation_parts.append(f"{ref_res}{position_number}{res} ({pct}%)")
                 
-                representation = " | ".join(representation_parts)
+                # Join multiple mutations with comma separation for clarity
+                if len(mutation_parts) > 1:
+                    mutation_display = ", ".join(mutation_parts)
+                else:
+                    mutation_display = mutation_parts[0] if mutation_parts else ""
+                
+                # Final representation: Reference frequency | All mutations
+                if ref_freq > 0:
+                    representation = f"{ref_res} ({ref_freq}%) | {mutation_display}"
+                else:
+                    representation = mutation_display
                 logging.debug(f"Position {position_number}: Enhanced representation = {representation}")
             
             results.append({

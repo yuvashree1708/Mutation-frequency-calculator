@@ -1,5 +1,8 @@
 // Workspace JavaScript for Interactive Mutation Analysis
 
+// Global workspace instance for onclick handlers
+let dashboard = null;
+
 class MutationWorkspace {
     constructor() {
         this.currentFileId = null;
@@ -317,7 +320,7 @@ class MutationWorkspace {
         // Render mutated positions with click handlers
         if (mutatedPositions.length > 0) {
             const mutatedHtml = mutatedPositions.map(pos => 
-                `<button class="position-badge" title="Click to highlight position ${pos}" data-position="${pos}" onclick="window.dashboard.highlightTablePosition(${pos})">${pos}</button>`
+                `<button class="position-badge" title="Click to highlight position ${pos}" data-position="${pos}" onclick="dashboard.highlightTablePosition(${pos})">${pos}</button>`
             ).join('');
             mutatedContainer.innerHTML = mutatedHtml;
         } else {
@@ -327,7 +330,7 @@ class MutationWorkspace {
         // Render low confidence positions with click handlers
         if (lowConfPositions.length > 0) {
             const lowConfHtml = lowConfPositions.map(pos => 
-                `<button class="position-badge low-conf" title="Click to highlight position ${pos}" data-position="${pos}" onclick="window.dashboard.highlightTablePosition(${pos})">${pos}</button>`
+                `<button class="position-badge low-conf" title="Click to highlight position ${pos}" data-position="${pos}" onclick="dashboard.highlightTablePosition(${pos})">${pos}</button>`
             ).join('');
             lowConfContainer.innerHTML = lowConfHtml;
         } else {
@@ -420,17 +423,25 @@ class MutationWorkspace {
         if (color === 'Green') {
             return `<span class="conserved-residue">${representation}</span>`;
         } else {
-            // Split by | and format each part for enhanced readability
+            // Enhanced formatting for mutations with clear separation
             const parts = representation.split(' | ');
-            return parts.map(part => {
+            const formattedParts = [];
+            
+            parts.forEach(part => {
                 if (part.includes('(') && !part.match(/^[A-Z]\d+[A-Z]/)) {
                     // Reference residue part (e.g., "A (20%)")
-                    return `<span class="reference-freq">${part}</span>`;
+                    formattedParts.push(`<span class="reference-freq">${part}</span>`);
                 } else {
-                    // Mutation part (format: A123T (50%))
-                    return `<span class="mutation-change">${part}</span>`;
+                    // Multiple mutations part - split by comma and format each
+                    const mutations = part.split(', ');
+                    const formattedMutations = mutations.map(mutation => 
+                        `<span class="mutation-change">${mutation.trim()}</span>`
+                    ).join('<span class="mutation-separator">, </span>');
+                    formattedParts.push(formattedMutations);
                 }
-            }).join('<span class="separator"> | </span>');
+            });
+            
+            return formattedParts.join('<span class="separator"> | </span>');
         }
     }
     
