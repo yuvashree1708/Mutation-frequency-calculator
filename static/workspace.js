@@ -88,22 +88,22 @@ class MutationWorkspace {
     }
 
     validateFile(file) {
-        const allowedTypes = ['fasta', 'fa'];
-        const maxSize = 16 * 1024 * 1024; // 16MB
+        const allowedTypes = ['fasta', 'fa', 'txt', 'csv', 'fas', 'aln', 'seq', 'msa', 'phylip', 'phy', 'nex', 'nexus'];
+        const maxSize = 3 * 1024 * 1024 * 1024; // 3GB
         
         const extension = file.name.split('.').pop().toLowerCase();
         
         if (!allowedTypes.includes(extension)) {
             return { 
                 valid: false, 
-                error: 'Invalid file type. Please select a FASTA file (.fasta or .fa).' 
+                error: 'Invalid file type. Please select a genomic alignment file (FASTA, TXT, CSV, etc.).' 
             };
         }
         
         if (file.size > maxSize) {
             return { 
                 valid: false, 
-                error: 'File size exceeds 16MB limit. Please choose a smaller file.' 
+                error: 'File too large. Maximum size is 3GB.' 
             };
         }
         
@@ -114,36 +114,62 @@ class MutationWorkspace {
         const formData = new FormData();
         formData.append('file', file);
 
-        // Show upload progress
+        // Show upload progress with file size info
         this.showUploadProgress();
-        this.updateUploadStatus('Uploading and processing file...');
+        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1);
+        this.updateUploadStatus(`Uploading ${fileSizeMB}MB file...`);
 
-        fetch(`/upload/${this.workspace}`, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            this.hideUploadProgress();
-            
-            if (data.success) {
-                this.showToast('Success', data.message, 'success');
-                this.updateUploadStatus('');
-                this.loadHistory(); // Refresh history
-                this.loadFileData(data.file_id); // Load the new file
+        // Create XMLHttpRequest for better progress tracking
+        const xhr = new XMLHttpRequest();
+        
+        // Track upload progress
+        xhr.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+                const percentComplete = (e.loaded / e.total) * 100;
+                this.updateUploadProgress(percentComplete);
+                this.updateUploadStatus(`Uploading... ${percentComplete.toFixed(1)}%`);
+            }
+        });
+
+        xhr.onload = () => {
+            if (xhr.status === 200) {
+                const data = JSON.parse(xhr.responseText);
+                this.hideUploadProgress();
                 
-                // Clear file input
-                document.getElementById('fileInput').value = '';
+                if (data.success) {
+                    this.showToast('Success', data.message, 'success');
+                    this.updateUploadStatus('');
+                    this.loadHistory(); // Refresh history
+                    this.loadFileData(data.file_id); // Load the new file
+                    
+                    // Clear file input
+                    document.getElementById('fileInput').value = '';
+                } else {
+                    this.showToast('Error', data.error, 'danger');
+                    this.updateUploadStatus('Upload failed');
+                }
             } else {
-                this.showToast('Error', data.error, 'danger');
+                this.hideUploadProgress();
+                this.showToast('Error', 'Upload failed: Server error', 'danger');
                 this.updateUploadStatus('Upload failed');
             }
-        })
-        .catch(error => {
+        };
+
+        xhr.onerror = () => {
             this.hideUploadProgress();
-            this.showToast('Error', 'Upload failed: ' + error.message, 'danger');
+            this.showToast('Error', 'Upload failed: Network error', 'danger');
             this.updateUploadStatus('Upload failed');
-        });
+        };
+
+        xhr.timeout = 300000; // 5 minutes timeout for large files
+        xhr.ontimeout = () => {
+            this.hideUploadProgress();
+            this.showToast('Error', 'Upload timed out. File may be too large.', 'danger');
+            this.updateUploadStatus('Upload timed out');
+        };
+
+        xhr.open('POST', `/upload/${this.workspace}`);
+        xhr.send(formData);
     }
 
     loadHistory() {
@@ -499,6 +525,29 @@ class MutationWorkspace {
 
     updateUploadStatus(message) {
         document.getElementById('uploadStatus').textContent = message;
+    }
+
+    showUploadProgress() {
+        const progressContainer = document.getElementById('upload-progress');
+        if (progressContainer) {
+            progressContainer.style.display = 'block';
+            this.updateUploadProgress(0);
+        }
+    }
+
+    hideUploadProgress() {
+        const progressContainer = document.getElementById('upload-progress');
+        if (progressContainer) {
+            progressContainer.style.display = 'none';
+        }
+    }
+
+    updateUploadProgress(percentage) {
+        const progressBar = document.querySelector('#upload-progress .progress-bar');
+        if (progressBar) {
+            progressBar.style.width = `${percentage}%`;
+            progressBar.setAttribute('aria-valuenow', percentage);
+        }
     }
 
     showLoadingSpinner() {

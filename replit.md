@@ -5,7 +5,7 @@ This is an interactive bioinformatics web dashboard for analyzing mutation frequ
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
-File upload preferences: Maximum file size support (3GB per file) for large genomic datasets.
+File upload preferences: Maximum file size support (3GB per file) for large genomic datasets with optimized upload progress tracking and chunked processing.
 Workspace storage: Keyword-based shared file access system for team collaboration.
 Access control: Limited to "DENV" and "CHIKV" keywords only for workspace access.
 File viewing: Each file requires "View Mutation Freq Table" button for viewing detailed mutation data.
@@ -25,7 +25,7 @@ Device accessibility: Fully responsive design for mobile phones, tablets, laptop
 ## Backend Architecture
 - **Web Framework**: Flask with RESTful API endpoints for AJAX communication and SQLAlchemy ORM
 - **Database**: PostgreSQL with Flask-SQLAlchemy for persistent file storage and metadata management
-- **File Processing**: AJAX-based file upload with unique file ID generation and temporary storage
+- **File Processing**: Optimized XMLHttpRequest upload with real-time progress tracking, 3GB file support, and 5-minute timeout for large files
 - **Data Persistence**: Database models for UploadedFile with comprehensive metadata and analysis results
 - **API Endpoints**: /api/file/<id>, /api/history, /api/clear-history for dynamic data management
 - **Logging**: Python logging module with detailed debugging for file processing and database operations
@@ -33,7 +33,7 @@ Device accessibility: Fully responsive design for mobile phones, tablets, laptop
 ## Data Processing Engine
 - **Bioinformatics Library**: BioPython for sequence alignment parsing and analysis
 - **File Format Support**: FASTA, FA, TXT, and CSV alignment files
-- **Analysis Algorithm**: Position-by-position mutation frequency calculation with configurable gap handling
+- **Analysis Algorithm**: Position-by-position mutation frequency calculation with configurable gap handling and chunked processing for large datasets (1000 positions per chunk)
 - **Output Generation**: CSV export functionality with detailed mutation statistics
 
 ## File Storage Strategy

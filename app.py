@@ -29,6 +29,8 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
     "pool_pre_ping": True,
 }
+# Increase max content length for large file uploads (3GB)
+app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024 * 1024  # 3GB
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Import database models after app configuration
@@ -142,21 +144,20 @@ def upload_file(workspace_name):
             json.dump(results, f)
         
         # Save file information to database for persistent storage
-        new_file = UploadedFile(
-            id=file_id,
-            filename=filename,
-            original_filename=file.filename,
-            workspace=workspace_name,
-            keyword=keyword,
-            upload_time=datetime.utcnow(),
-            results_file=results_file,
-            output_file=output_file,
-            total_positions=total_positions,
-            mutation_count=len(mutated_positions),
-            conserved_count=total_positions - len(mutated_positions),
-            mutated_positions=json.dumps(mutated_positions),
-            low_conf_positions=json.dumps(low_conf_positions)
-        )
+        new_file = UploadedFile()
+        new_file.id = file_id
+        new_file.filename = filename
+        new_file.original_filename = file.filename
+        new_file.workspace = workspace_name
+        new_file.keyword = keyword
+        new_file.upload_time = datetime.utcnow()
+        new_file.results_file = results_file
+        new_file.output_file = output_file
+        new_file.total_positions = total_positions
+        new_file.mutation_count = len(mutated_positions)
+        new_file.conserved_count = total_positions - len(mutated_positions)
+        new_file.mutated_positions = json.dumps(mutated_positions)
+        new_file.low_conf_positions = json.dumps(low_conf_positions)
         
         try:
             db.session.add(new_file)

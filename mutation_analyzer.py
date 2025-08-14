@@ -41,11 +41,21 @@ def analyze_mutations(filepath, include_gaps=False):
         # Pick reference sequence (first sequence in alignment)
         reference_seq = alignment[0].seq
         
-        logging.debug(f"Processing {len(alignment)} sequences with {num_positions} positions")
+        logging.info(f"Processing {len(alignment)} sequences with {num_positions} positions")
+        file_size_mb = os.path.getsize(filepath) / (1024 * 1024)
+        logging.info(f"File size: {file_size_mb:.1f}MB")
         
         results = []
         
+        # Process in chunks for large files to optimize memory usage
+        chunk_size = min(1000, num_positions) if file_size_mb > 10 else num_positions
+        if chunk_size < num_positions:
+            logging.info(f"Processing large file in chunks of {chunk_size} positions")
+        
         for i in range(num_positions):
+            if i % chunk_size == 0:
+                logging.debug(f"Processing position {i + 1}/{num_positions} ({((i + 1) / num_positions * 100):.1f}%)")
+            
             column = alignment[:, i]  # Residues at position i across all sequences
             counts = Counter(column)
             
