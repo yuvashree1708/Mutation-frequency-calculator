@@ -63,7 +63,14 @@ class UploadedFile(db.Model):
         query = cls.query.filter_by(id=file_id)
         if keyword:
             query = query.filter_by(keyword=keyword)
-        return query.first()
+        
+        file_obj = query.first()
+        if file_obj:
+            logging.info(f"Found file: {file_obj.filename}, results_file: {file_obj.results_file}")
+        else:
+            logging.error(f"File not found: {file_id} with keyword: {keyword}")
+        
+        return file_obj
     
     @classmethod
     def get_keyword_files(cls, workspace, keyword, limit=25):

@@ -260,7 +260,39 @@ def get_file_data(workspace_name, file_id):
         results_path = os.path.join(app.config['UPLOAD_FOLDER'], file_data['results_file'])
         
         if not os.path.exists(results_path):
-            return jsonify({'error': 'Results file not found on disk'}), 404
+            logging.error(f"Results file missing: {results_path}")
+            # Try to regenerate results from original file if it exists
+            # Check multiple possible locations for the original file
+            possible_paths = []
+            if uploaded_file.uploaded_file_path:
+                possible_paths.append(os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.uploaded_file_path))
+            
+            # Also try the filename
+            possible_paths.append(os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename))
+            
+            # Try to find any matching file
+            original_file_path = None
+            for path in possible_paths:
+                if os.path.exists(path):
+                    original_file_path = path
+                    break
+            
+            if original_file_path:
+                logging.info(f"Regenerating results from original file: {original_file_path}")
+                try:
+                    from mutation_analyzer import analyze_mutations
+                    results, _ = analyze_mutations(original_file_path)
+                    
+                    # Save regenerated results
+                    with open(results_path, 'w') as f:
+                        json.dump(results, f)
+                    logging.info(f"Results regenerated successfully: {results_path}")
+                except Exception as regen_error:
+                    logging.error(f"Failed to regenerate results: {str(regen_error)}")
+                    return jsonify({'error': 'Results file not found and cannot be regenerated'}), 404
+            else:
+                logging.error(f"Original file also missing: {original_file_path}")
+                return jsonify({'error': 'Both results and original files are missing'}), 404
         
         # Check if it's a legacy pickle file or new JSON file
         if file_data['results_file'].endswith('.pkl'):
