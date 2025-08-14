@@ -359,18 +359,38 @@ html, body {
 
 .team-member-top {
     text-align: center;
-    padding: 1rem 0.75rem;
+    padding: 0.75rem 0.75rem 1rem 0.75rem;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 10px;
     transition: all 0.3s ease;
     height: 100%;
+    position: relative;
 }
 
 .team-member-top:hover {
     transform: translateY(-2px);
     background: rgba(255, 255, 255, 0.06);
     border-color: rgba(var(--bs-primary-rgb), 0.4);
+}
+
+.user-label {
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--bs-primary), var(--bs-info));
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 8px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.team-member-top.mentor .user-label {
+    background: linear-gradient(135deg, #dc3545, #fd7e14);
 }
 
 .team-member-top.mentor .member-icon-top {
@@ -384,7 +404,7 @@ html, body {
 .member-icon-top {
     width: 40px;
     height: 40px;
-    margin: 0 auto 0.75rem;
+    margin: 1rem auto 0.75rem;
     border-radius: 50%;
     display: flex;
     align-items: center;
