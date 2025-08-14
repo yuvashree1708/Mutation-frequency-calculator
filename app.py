@@ -73,10 +73,11 @@ def workspace(workspace_name):
     # Get keyword from URL parameter or session
     keyword = request.args.get('keyword') or session.get(f'{workspace_name}_keyword')
     
-    if not keyword:
-        # Redirect to index with message to enter keyword
-        flash('Please enter a keyword to access the workspace', 'info')
-        return redirect(url_for('index'))
+    # For DENV and CHIKV workspaces, enforce the exact keywords
+    if workspace_name == 'denv' and keyword != 'DENV':
+        keyword = 'DENV'
+    elif workspace_name == 'chikv' and keyword != 'CHIKV':
+        keyword = 'CHIKV'
     
     # Store keyword in session for this workspace
     session[f'{workspace_name}_keyword'] = keyword
@@ -121,11 +122,15 @@ def upload_file(workspace_name):
     
     filepath = None
     try:
-        # Generate unique file ID and save uploaded file
+        # Generate unique file ID and save uploaded file permanently
         file_id = str(uuid.uuid4())
         filename = secure_filename(file.filename or 'uploaded_file')
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], f"{file_id}_{filename}")
+        # Store with unique ID prefix for permanent access
+        permanent_filename = f"{file_id}_{filename}"
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], permanent_filename)
         file.save(filepath)
+        
+        logging.info(f"File saved permanently: {permanent_filename}")
         
         # Process the file
         results, output_file = analyze_mutations(filepath)
@@ -170,8 +175,16 @@ def upload_file(workspace_name):
         
         logging.debug(f"File processed: {filename}, mutations at positions: {mutated_positions[:10]}...")
         
-        # Clean up uploaded file
-        os.remove(filepath)
+        # Store original uploaded file permanently - update database with permanent path
+        permanent_filepath = filepath  # Already using permanent filename
+        new_file.uploaded_file_path = permanent_filename
+        
+        try:
+            db.session.commit()  # Update database with file path
+            logging.info(f"File permanently stored: {permanent_filename}")
+        except Exception as db_error:
+            logging.error(f"Error updating file path in database: {str(db_error)}")
+            db.session.rollback()
         
         return jsonify({
             'success': True,
@@ -182,12 +195,8 @@ def upload_file(workspace_name):
         
     except Exception as e:
         logging.error(f"Error processing file: {str(e)}")
-        # Clean up on error
-        try:
-            if 'filepath' in locals() and filepath and os.path.exists(filepath):
-                os.remove(filepath)
-        except Exception:
-            pass  # Ignore cleanup errors
+        # Don't clean up uploaded files on error - keep them for debugging and potential recovery
+        logging.error(f"File processing failed but uploaded file preserved: {filepath if 'filepath' in locals() else 'unknown'}")
         return jsonify({'error': f'Error processing file: {str(e)}'}), 500
 
 @app.route('/download/<filename>')

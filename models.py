@@ -20,6 +20,7 @@ class UploadedFile(db.Model):
     upload_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     results_file = db.Column(db.String(255), nullable=False)  # path to JSON results file
     output_file = db.Column(db.String(255), nullable=True)   # path to CSV output file
+    uploaded_file_path = db.Column(db.String(255), nullable=True)  # path to original uploaded file
     total_positions = db.Column(db.Integer, nullable=False)
     mutation_count = db.Column(db.Integer, nullable=False)
     conserved_count = db.Column(db.Integer, nullable=False)
@@ -40,6 +41,7 @@ class UploadedFile(db.Model):
             'upload_time': self.upload_time.strftime('%Y-%m-%d %H:%M:%S'),
             'results_file': self.results_file,
             'output_file': self.output_file,
+            'uploaded_file_path': self.uploaded_file_path,
             'total_positions': self.total_positions,
             'mutation_count': self.mutation_count,
             'conserved_count': self.conserved_count,
