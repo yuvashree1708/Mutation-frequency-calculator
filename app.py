@@ -220,38 +220,64 @@ def upload_file(workspace_name):
         
         logging.info(f"Results saved with multiple backups: {results_file}, {backup_file}, and permanent backup")
         
-        # Save file information to database for persistent storage
-        new_file = UploadedFile()
-        new_file.id = file_id
-        new_file.filename = filename
-        new_file.original_filename = file.filename
-        new_file.workspace = workspace_name
-        new_file.keyword = keyword
-        new_file.upload_time = datetime.utcnow()
-        new_file.results_file = results_file
-        new_file.output_file = output_file
-        new_file.total_positions = total_positions
-        new_file.mutation_count = len(mutated_positions)
-        new_file.conserved_count = total_positions - len(mutated_positions)
-        new_file.mutated_positions = json.dumps(mutated_positions)
-        new_file.low_conf_positions = json.dumps(low_conf_positions)
+        # Save file information to database with full transactional integrity
+        db_transaction_successful = False
         
-        # Don't commit yet - add file path first
-        db.session.add(new_file)
-        
-        logging.debug(f"File processed: {filename}, mutations at positions: {mutated_positions[:10]}...")
-        
-        # Store the uploaded file path in database
-        new_file.uploaded_file_path = permanent_filename
-        
-        # Update the database with file path before committing
         try:
+            # Begin explicit database transaction
+            db.session.begin()
+            
+            new_file = UploadedFile()
+            new_file.id = file_id
+            new_file.filename = filename
+            new_file.original_filename = file.filename
+            new_file.workspace = workspace_name
+            new_file.keyword = keyword
+            new_file.upload_time = datetime.utcnow()
+            new_file.results_file = results_file
+            new_file.output_file = output_file
+            new_file.total_positions = total_positions
+            new_file.mutation_count = len(mutated_positions)
+            new_file.conserved_count = total_positions - len(mutated_positions)
+            new_file.mutated_positions = json.dumps(mutated_positions)
+            new_file.low_conf_positions = json.dumps(low_conf_positions)
+            new_file.uploaded_file_path = permanent_filename
+            
+            # Add to session
+            db.session.add(new_file)
+            
+            # Commit the transaction
             db.session.commit()
-            logging.info(f"File permanently stored and database updated: {permanent_filename}")
+            db_transaction_successful = True
+            
+            logging.info(f"Database transaction completed successfully: {file_id}")
+            logging.debug(f"File processed: {filename}, mutations at positions: {mutated_positions[:10]}...")
+            
         except Exception as db_error:
-            logging.error(f"Error updating database with file path: {str(db_error)}")
             db.session.rollback()
-            raise Exception(f"Failed to update file path in database: {str(db_error)}")
+            logging.error(f"Database transaction failed, rolling back: {str(db_error)}")
+            
+            # Complete cleanup of all created files if database transaction fails
+            cleanup_files = [
+                filepath,  # Original uploaded file
+                backup_filepath,  # Backup of uploaded file
+                results_path,  # Results file
+                backup_path,  # Backup results file
+                permanent_backup  # Permanent backup
+            ]
+            
+            for cleanup_file in cleanup_files:
+                if os.path.exists(cleanup_file):
+                    try:
+                        os.remove(cleanup_file)
+                        logging.info(f"Cleaned up file after DB failure: {cleanup_file}")
+                    except Exception as cleanup_error:
+                        logging.error(f"Failed to cleanup file {cleanup_file}: {str(cleanup_error)}")
+            
+            raise Exception(f"Database transaction failed - all files cleaned up: {str(db_error)}")
+        
+        if not db_transaction_successful:
+            raise Exception("Database transaction was not completed successfully")
         
         return jsonify({
             'success': True,
@@ -442,6 +468,73 @@ def get_file_data(workspace_name, file_id):
         logging.error(f"Error loading results file: {str(e)}")
         return jsonify({'error': 'Failed to load results data'}), 500
 
+@app.route('/api/<workspace_name>/delete-file/<file_id>', methods=['DELETE'])
+def delete_file(workspace_name, file_id):
+    """Delete a specific file from workspace with complete cleanup."""
+    keyword = session.get('keyword')
+    if not keyword or workspace_name.lower() not in ['denv', 'chikv']:
+        return jsonify({'error': 'Invalid workspace or session expired'}), 400
+    
+    try:
+        # Begin database transaction
+        db.session.begin()
+        
+        # Find the file record
+        file_record = UploadedFile.query.filter_by(
+            id=file_id, 
+            workspace=workspace_name.lower()
+        ).first()
+        
+        if not file_record:
+            return jsonify({'error': 'File not found'}), 404
+        
+        # Collect all associated files for cleanup
+        files_to_delete = []
+        
+        if file_record.uploaded_file_path:
+            files_to_delete.extend([
+                os.path.join(app.config['UPLOAD_FOLDER'], file_record.uploaded_file_path),
+                os.path.join('backups', file_record.uploaded_file_path)
+            ])
+        
+        if file_record.results_file:
+            results_base = file_record.results_file.replace('.json', '')
+            files_to_delete.extend([
+                os.path.join(app.config['UPLOAD_FOLDER'], file_record.results_file),
+                os.path.join(app.config['UPLOAD_FOLDER'], f"{results_base}_backup.json"),
+                os.path.join('backups', f"{results_base}_backup.json")
+            ])
+        
+        if file_record.output_file:
+            files_to_delete.append(os.path.join(app.config['UPLOAD_FOLDER'], file_record.output_file))
+        
+        # Delete database record first
+        db.session.delete(file_record)
+        db.session.commit()
+        
+        # Clean up associated files
+        deleted_files = 0
+        for file_path in files_to_delete:
+            if os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                    deleted_files += 1
+                    logging.info(f"Deleted file: {file_path}")
+                except Exception as file_error:
+                    logging.error(f"Failed to delete file {file_path}: {str(file_error)}")
+        
+        logging.info(f"Successfully deleted file {file_id} and {deleted_files} associated files")
+        return jsonify({
+            'success': True,
+            'message': f'File deleted successfully',
+            'files_cleaned': deleted_files
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"Error deleting file {file_id}: {str(e)}")
+        return jsonify({'error': f'Failed to delete file: {str(e)}'}), 500
+
 @app.route('/api/<workspace_name>/history')
 def get_history(workspace_name):
     """Get current workspace file history."""
@@ -471,7 +564,7 @@ def get_history(workspace_name):
 
 @app.route('/api/<workspace_name>/clear-history', methods=['POST'])
 def clear_history(workspace_name):
-    """Clear workspace file history for the current keyword."""
+    """Clear workspace file history with complete transactional integrity."""
     if workspace_name not in ['denv', 'chikv']:
         return jsonify({'error': 'Invalid workspace'}), 400
     
@@ -481,36 +574,72 @@ def clear_history(workspace_name):
         return jsonify({'error': 'No keyword found. Please refresh the page.'}), 400
     
     try:
+        # Begin database transaction
+        db.session.begin()
+        
         # Get all files for the workspace and keyword
         files_to_delete = UploadedFile.get_keyword_files(workspace_name, keyword, limit=1000)
+        files_count = len(files_to_delete)
         
-        # Clean up files from disk
+        if files_count == 0:
+            return jsonify({
+                'success': True,
+                'message': f'{workspace_name.upper()} workspace is already empty',
+                'files_deleted': 0,
+                'files_cleaned': 0
+            })
+        
+        # Collect all files for cleanup
+        all_files_to_delete = []
+        
         for uploaded_file in files_to_delete:
-            try:
-                # Remove results file
-                results_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.results_file)
-                if os.path.exists(results_path):
-                    os.remove(results_path)
-                
-                # Remove output file if exists
-                if uploaded_file.output_file:
-                    output_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.output_file)
-                    if os.path.exists(output_path):
-                        os.remove(output_path)
-                        
-            except Exception as e:
-                logging.error(f"Error cleaning up files for {uploaded_file.id}: {str(e)}")
+            # Original uploaded file
+            if uploaded_file.uploaded_file_path:
+                all_files_to_delete.extend([
+                    os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.uploaded_file_path),
+                    os.path.join('backups', uploaded_file.uploaded_file_path)
+                ])
+            
+            # Results files
+            if uploaded_file.results_file:
+                results_base = uploaded_file.results_file.replace('.json', '')
+                all_files_to_delete.extend([
+                    os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.results_file),
+                    os.path.join(app.config['UPLOAD_FOLDER'], f"{results_base}_backup.json"),
+                    os.path.join('backups', f"{results_base}_backup.json")
+                ])
+            
+            # Output files
+            if uploaded_file.output_file:
+                all_files_to_delete.append(os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.output_file))
         
-        # Delete from database (only files with this keyword)
+        # Delete from database first (transactional)
         UploadedFile.query.filter_by(workspace=workspace_name, keyword=keyword).delete()
         db.session.commit()
         
-        return jsonify({'success': True, 'message': f'History cleared for {workspace_name} workspace with keyword "{keyword}"'})
+        # Clean up all associated files
+        deleted_files = 0
+        for file_path in all_files_to_delete:
+            if os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                    deleted_files += 1
+                    logging.info(f"Deleted file: {file_path}")
+                except Exception as file_error:
+                    logging.error(f"Failed to delete file {file_path}: {str(file_error)}")
+        
+        logging.info(f"Cleared {files_count} database records and {deleted_files} files from {workspace_name} workspace")
+        return jsonify({
+            'success': True, 
+            'message': f'History cleared for {workspace_name.upper()} workspace', 
+            'files_deleted': files_count,
+            'files_cleaned': deleted_files
+        })
         
     except Exception as e:
-        logging.error(f"Error clearing history: {str(e)}")
         db.session.rollback()
-        return jsonify({'error': 'Failed to clear history'}), 500
+        logging.error(f"Error clearing workspace history: {str(e)}")
+        return jsonify({'error': f'Failed to clear workspace history: {str(e)}'}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
