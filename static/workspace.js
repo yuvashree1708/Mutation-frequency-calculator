@@ -416,10 +416,16 @@ class MutationWorkspace {
     }
 
     renderDataTable(results) {
-        // Destroy existing DataTable if exists
+        // Properly destroy existing DataTable if it exists
         if (this.dataTable) {
-            this.dataTable.destroy();
-            this.dataTable = null;
+            try {
+                this.dataTable.destroy();
+                this.dataTable = null;
+                // Remove any DataTables specific classes
+                $('#dataTable').removeClass('dataTable');
+            } catch (e) {
+                console.warn('Error destroying DataTable:', e);
+            }
         }
 
         const tableBody = document.querySelector('#dataTable tbody');
@@ -452,42 +458,49 @@ class MutationWorkspace {
         tableBody.innerHTML = rowsHtml;
 
         // Initialize DataTable with enhanced visibility for positions up to 50
-        this.dataTable = $('#dataTable').DataTable({
-            pageLength: 50, // Show first 50 positions clearly
-            lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]], // Multiple page size options
-            paging: true, // Enable pagination for better position viewing
-            scrollY: '65vh', // Vertical scrolling height
-            scrollX: true, // Horizontal scrolling if needed
-            scrollCollapse: true,
-            order: [[0, 'asc']], // Sort by position
-            dom: '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
-                 '<"row"<"col-sm-12"tr>>' +
-                 '<"row"<"col-sm-5"i><"col-sm-7"p>>', // Show all controls including pagination
-            columnDefs: [
-                {
-                    targets: [5, 6], // Raw counts and frequencies columns
-                    orderable: false
+        try {
+            this.dataTable = $('#dataTable').DataTable({
+                destroy: true, // Allow DataTable to be destroyed and recreated
+                pageLength: 50, // Show first 50 positions clearly
+                lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]], // Multiple page size options
+                paging: true, // Enable pagination for better position viewing
+                scrollY: '65vh', // Vertical scrolling height
+                scrollX: true, // Horizontal scrolling if needed
+                scrollCollapse: true,
+                order: [[0, 'asc']], // Sort by position
+                dom: '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
+                     '<"row"<"col-sm-12"tr>>' +
+                     '<"row"<"col-sm-5"i><"col-sm-7"p>>', // Show all controls including pagination
+                columnDefs: [
+                    {
+                        targets: [5, 6], // Raw counts and frequencies columns
+                        orderable: false
+                    },
+                    {
+                        targets: [0], // Position column
+                        className: 'text-center fw-bold'
+                    },
+                    {
+                        targets: [1, 2, 4], // Reference, Status, Confidence columns
+                        className: 'text-center'
+                    }
+                ],
+                language: {
+                    search: "Search positions and mutations:",
+                    info: "Showing _START_ to _END_ of _TOTAL_ positions",
+                    infoEmpty: "No positions found",
+                    infoFiltered: "(filtered from _MAX_ total positions)",
+                    lengthMenu: "Show _MENU_ positions per page"
                 },
-                {
-                    targets: [0], // Position column
-                    className: 'text-center fw-bold'
-                },
-                {
-                    targets: [1, 2, 4], // Reference, Status, Confidence columns
-                    className: 'text-center'
-                }
-            ],
-            language: {
-                search: "Search positions and mutations:",
-                info: "Showing _START_ to _END_ of _TOTAL_ positions",
-                infoEmpty: "No positions found",
-                infoFiltered: "(filtered from _MAX_ total positions)",
-                lengthMenu: "Show _MENU_ positions per page"
-            },
-            responsive: false,
-            autoWidth: false,
-            processing: false
-        });
+                responsive: false,
+                autoWidth: false,
+                processing: false
+            });
+        } catch (e) {
+            console.error('Error initializing DataTable:', e);
+            // Fallback: show table without DataTable features
+            console.log('Table displayed without DataTable enhancements');
+        }
 
         // Add custom styling for DataTables elements
         this.styleDataTable();
@@ -701,9 +714,19 @@ class MutationWorkspace {
         document.getElementById('filesSection').style.display = 'block';
         document.getElementById('analysisSection').style.display = 'none';
         
+        // Properly destroy DataTable with enhanced cleanup
         if (this.dataTable) {
-            this.dataTable.destroy();
-            this.dataTable = null;
+            try {
+                this.dataTable.destroy();
+                this.dataTable = null;
+                // Remove DataTables specific classes
+                $('#dataTable').removeClass('dataTable');
+                // Clear any DataTables wrapper elements
+                $('#dataTable_wrapper').remove();
+            } catch (e) {
+                console.warn('Error destroying DataTable in resetView:', e);
+                this.dataTable = null;
+            }
         }
     }
 
