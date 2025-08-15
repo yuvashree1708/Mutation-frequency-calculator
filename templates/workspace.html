@@ -225,22 +225,38 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="{{ url_for('static', filename='file_cache.js') }}"></script>
+    <script src="{{ url_for('static', filename='adaptive_ui.js') }}"></script>
     <script>
-        // Initialize the workspace
+        // Initialize workspace with adaptive UI data
         const workspace = '{{ workspace }}';
         const keyword = '{{ keyword }}';
-    </script>
-    <script>
+        const workspaceData = {
+            workspace: '{{ workspace }}',
+            userSessionId: '{{ user_session_id if user_session_id else "" }}',
+            userPreferences: {{ user_preferences | tojson if user_preferences else "{}" }},
+            layoutConfig: {{ layout_config | tojson if layout_config else "{}" }}
+        };
+        
         // Pass workspace to JavaScript
         window.WORKSPACE = '{{ workspace }}';
         console.log('Workspace set to:', window.WORKSPACE);
+        console.log('User preferences loaded:', workspaceData.userPreferences);
     </script>
     <script src="{{ url_for('static', filename='workspace.js') }}"></script>
     <script>
-        // Initialize the workspace when page loads
+        // Initialize the workspace and adaptive UI when page loads
         document.addEventListener('DOMContentLoaded', function() {
             dashboard = new MutationWorkspace();
             window.dashboard = dashboard; // For compatibility
+            
+            // Initialize adaptive UI if user session is available
+            if (workspaceData.userSessionId) {
+                window.adaptiveUI = new AdaptiveUIManager(
+                    workspaceData.workspace,
+                    workspaceData.userSessionId,
+                    workspaceData.userPreferences
+                );
+            }
         });
     </script>
 </body>

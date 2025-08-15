@@ -10,8 +10,17 @@ Workspace storage: Keyword-based shared file access system for team collaboratio
 Access control: Limited to "DENV" and "CHIKV" keywords only for workspace access.
 File viewing: Each file requires "View Mutation Freq Table" button for viewing detailed mutation data.
 Device accessibility: Fully responsive design for mobile phones, tablets, laptops, and desktops.
+Adaptive UI: Personalized interface that learns user preferences and adapts layouts, table settings, and workflows based on usage patterns.
+User preference memory: System remembers individual choices like table page sizes, sort preferences, frequently accessed positions, and UI layouts across sessions.
 
 # System Architecture
+
+## Adaptive UI & Personalization
+- **User Preference Tracking**: Database-backed system that learns from user interactions and saves preferences persistently
+- **Activity Learning**: Tracks user patterns like frequently accessed positions, preferred table settings, and file usage
+- **Layout Optimization**: Automatically suggests and applies optimal UI configurations based on user behavior
+- **Session Continuity**: Remembers last viewed files, table states, and workspace configurations across sessions
+- **Smart Recommendations**: Provides personalized tips and shortcuts based on usage patterns
 
 ## Frontend Architecture
 - **Template Engine**: Single-page dashboard template (workspace.html) with Bootstrap 5 dark theme

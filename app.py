@@ -37,7 +37,7 @@ app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024 * 1024  # 3GB
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Import database models after app configuration
-from models import db, UploadedFile
+from models import db, UploadedFile, UserPreference, UserActivity, AdaptiveLayout
 
 # Initialize the database with the app
 db.init_app(app)
@@ -84,9 +84,17 @@ def index():
     """Main landing page with workspace selection."""
     return render_template('index.html')
 
+def get_user_session_id():
+    """Get or create a unique session ID for user preference tracking."""
+    if 'user_session_id' not in session:
+        import uuid
+        session['user_session_id'] = str(uuid.uuid4())
+        session.permanent = True
+    return session['user_session_id']
+
 @app.route('/workspace/<workspace_name>')
 def workspace(workspace_name):
-    """Workspace dashboard for DENV or CHIKV analysis."""
+    """Workspace dashboard for DENV or CHIKV analysis with adaptive UI."""
     if workspace_name not in ['denv', 'chikv']:
         return redirect(url_for('index'))
     
@@ -102,6 +110,35 @@ def workspace(workspace_name):
     # Store keyword in session for this workspace
     session[f'{workspace_name}_keyword'] = keyword
     session.permanent = True
+    
+    # Get user session ID for personalization
+    user_session_id = get_user_session_id()
+    
+    # Load user preferences for adaptive UI
+    user_preferences = {
+        'table_page_size': UserPreference.get_preference(user_session_id, workspace_name, 'table_page_size', 50),
+        'upload_panel_width': UserPreference.get_preference(user_session_id, workspace_name, 'upload_panel_width', 25),
+        'preferred_sort_column': UserPreference.get_preference(user_session_id, workspace_name, 'preferred_sort_column', 0),
+        'preferred_sort_direction': UserPreference.get_preference(user_session_id, workspace_name, 'preferred_sort_direction', 'asc'),
+        'mutation_highlight_style': UserPreference.get_preference(user_session_id, workspace_name, 'mutation_highlight_style', 'standard'),
+        'last_viewed_file': UserPreference.get_preference(user_session_id, workspace_name, 'last_viewed_file'),
+        'frequent_positions': UserPreference.get_preference(user_session_id, workspace_name, 'frequent_positions', []),
+        'theme_preference': UserPreference.get_preference(user_session_id, workspace_name, 'theme_preference', 'dark')
+    }
+    
+    # Get optimal layout configuration
+    best_layout = AdaptiveLayout.get_best_layout(user_session_id, workspace_name)
+    layout_config = {}
+    if best_layout:
+        try:
+            import json
+            layout_config = json.loads(best_layout.layout_config)
+        except:
+            layout_config = {}
+    
+    # Log workspace access
+    UserActivity.log_activity(user_session_id, workspace_name, 'workspace_access')
+    
     logging.info(f"Keyword stored in session: {keyword} for workspace: {workspace_name}")
     
     # Load files from database for this keyword
@@ -118,7 +155,10 @@ def workspace(workspace_name):
                          workspace=workspace_name, 
                          history=history,
                          access_mode=access_mode,
-                         keyword=keyword)
+                         keyword=keyword,
+                         user_preferences=user_preferences,
+                         layout_config=layout_config,
+                         user_session_id=user_session_id)
 
 @app.route('/upload/<workspace_name>', methods=['POST'])
 def upload_file(workspace_name):
@@ -640,6 +680,139 @@ def clear_history(workspace_name):
         db.session.rollback()
         logging.error(f"Error clearing workspace history: {str(e)}")
         return jsonify({'error': f'Failed to clear workspace history: {str(e)}'}), 500
+
+# API endpoints for user preferences and adaptive UI
+@app.route('/api/<workspace_name>/preferences', methods=['POST'])
+def save_user_preference(workspace_name):
+    """Save user preference for adaptive UI."""
+    if workspace_name not in ['denv', 'chikv']:
+        return jsonify({'error': 'Invalid workspace'}), 400
+    
+    user_session_id = get_user_session_id()
+    data = request.get_json()
+    
+    if not data or 'key' not in data or 'value' not in data:
+        return jsonify({'error': 'Missing key or value'}), 400
+    
+    try:
+        UserPreference.set_preference(user_session_id, workspace_name, data['key'], data['value'])
+        
+        # Log preference change
+        UserActivity.log_activity(
+            user_session_id, 
+            workspace_name, 
+            'preference_change',
+            {'key': data['key'], 'value': data['value']}
+        )
+        
+        return jsonify({'success': True, 'message': 'Preference saved'})
+    except Exception as e:
+        logging.error(f"Error saving preference: {str(e)}")
+        return jsonify({'error': 'Failed to save preference'}), 500
+
+@app.route('/api/<workspace_name>/activity', methods=['POST'])
+def log_user_activity(workspace_name):
+    """Log user activity for adaptive learning."""
+    if workspace_name not in ['denv', 'chikv']:
+        return jsonify({'error': 'Invalid workspace'}), 400
+    
+    user_session_id = get_user_session_id()
+    data = request.get_json()
+    
+    if not data or 'activity_type' not in data:
+        return jsonify({'error': 'Missing activity_type'}), 400
+    
+    try:
+        UserActivity.log_activity(
+            user_session_id,
+            workspace_name,
+            data['activity_type'],
+            data.get('activity_data'),
+            data.get('file_id')
+        )
+        return jsonify({'success': True})
+    except Exception as e:
+        logging.error(f"Error logging activity: {str(e)}")
+        return jsonify({'error': 'Failed to log activity'}), 500
+
+@app.route('/api/<workspace_name>/layout-performance', methods=['POST'])
+def update_layout_performance(workspace_name):
+    """Update layout performance metrics."""
+    if workspace_name not in ['denv', 'chikv']:
+        return jsonify({'error': 'Invalid workspace'}), 400
+    
+    user_session_id = get_user_session_id()
+    data = request.get_json()
+    
+    if not data or 'layout_config' not in data or 'usage_time' not in data:
+        return jsonify({'error': 'Missing layout_config or usage_time'}), 400
+    
+    try:
+        AdaptiveLayout.update_layout_performance(
+            user_session_id,
+            workspace_name,
+            data['layout_config'],
+            data['usage_time'],
+            data.get('satisfaction')
+        )
+        return jsonify({'success': True})
+    except Exception as e:
+        logging.error(f"Error updating layout performance: {str(e)}")
+        return jsonify({'error': 'Failed to update layout performance'}), 500
+
+@app.route('/api/<workspace_name>/recommendations')
+def get_recommendations(workspace_name):
+    """Get personalized recommendations based on user patterns."""
+    if workspace_name not in ['denv', 'chikv']:
+        return jsonify({'error': 'Invalid workspace'}), 400
+    
+    user_session_id = get_user_session_id()
+    
+    try:
+        # Get recent activity patterns
+        recent_activities = UserActivity.get_user_patterns(user_session_id, workspace_name, days=7)
+        
+        recommendations = {
+            'suggested_page_size': 50,
+            'frequent_positions': [],
+            'suggested_files': [],
+            'optimization_tips': []
+        }
+        
+        # Analyze patterns and generate recommendations
+        file_views = {}
+        position_jumps = {}
+        
+        for activity in recent_activities:
+            if activity.activity_type == 'file_view' and activity.file_id:
+                file_views[activity.file_id] = file_views.get(activity.file_id, 0) + 1
+            elif activity.activity_type == 'position_jump':
+                try:
+                    import json
+                    data = json.loads(activity.activity_data) if activity.activity_data else {}
+                    position = data.get('position')
+                    if position:
+                        position_jumps[position] = position_jumps.get(position, 0) + 1
+                except:
+                    pass
+        
+        # Most frequently accessed positions
+        if position_jumps:
+            frequent_positions = sorted(position_jumps.items(), key=lambda x: x[1], reverse=True)[:10]
+            recommendations['frequent_positions'] = [pos for pos, count in frequent_positions]
+        
+        # Optimization suggestions based on usage patterns
+        if len(recent_activities) > 20:
+            recommendations['optimization_tips'].append("Consider using keyboard shortcuts for faster navigation")
+        
+        if any(a.activity_type == 'table_scroll' for a in recent_activities[-10:]):
+            recommendations['optimization_tips'].append("Try increasing table page size for less scrolling")
+        
+        return jsonify(recommendations)
+        
+    except Exception as e:
+        logging.error(f"Error generating recommendations: {str(e)}")
+        return jsonify({'error': 'Failed to generate recommendations'}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
