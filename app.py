@@ -62,6 +62,14 @@ with app.app_context():
         db.session.execute(text("SELECT 1"))
         db.session.commit()
         logging.info("Database connection established successfully")
+        
+        # Run startup integrity check
+        try:
+            from startup_integrity_check import startup_integrity_check
+            startup_integrity_check()
+        except Exception as integrity_error:
+            logging.error(f"Startup integrity check failed: {str(integrity_error)}")
+            
     except Exception as db_error:
         logging.error(f"Database initialization failed: {str(db_error)}")
         # Continue anyway for debugging purposes
@@ -155,13 +163,24 @@ def upload_file(workspace_name):
     
     filepath = None
     try:
-        # Generate unique file ID and save uploaded file permanently
+        # Generate unique file ID and save uploaded file permanently with atomic write
         file_id = str(uuid.uuid4())
         filename = secure_filename(file.filename or 'uploaded_file')
         # Store with unique ID prefix for permanent access
         permanent_filename = f"{file_id}_{filename}"
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], permanent_filename)
-        file.save(filepath)
+        
+        # Atomic file save - write to temp file then rename
+        temp_filepath = filepath + '.tmp'
+        file.save(temp_filepath)
+        os.rename(temp_filepath, filepath)  # Atomic operation
+        
+        # Create immediate backup of uploaded file
+        backup_dir = os.path.join(app.config['UPLOAD_FOLDER'], '..', 'backups')
+        os.makedirs(backup_dir, exist_ok=True)
+        backup_filepath = os.path.join(backup_dir, permanent_filename)
+        with open(filepath, 'rb') as src, open(backup_filepath, 'wb') as dst:
+            dst.write(src.read())
         
         logging.info(f"File saved permanently: {permanent_filename}")
         
@@ -178,17 +197,28 @@ def upload_file(workspace_name):
         results_file = f"results_{file_id}.json"
         results_path = os.path.join(app.config['UPLOAD_FOLDER'], results_file)
         
-        # Save primary results file
-        with open(results_path, 'w') as f:
-            json.dump(results, f, indent=2)  # Pretty print for debugging
+        # Save primary results file with atomic write
+        temp_results_path = results_path + '.tmp'
+        with open(temp_results_path, 'w') as f:
+            json.dump(results, f, indent=2)
+        os.rename(temp_results_path, results_path)  # Atomic operation
         
         # Create backup copy for redundancy
         backup_file = f"results_{file_id}_backup.json"
         backup_path = os.path.join(app.config['UPLOAD_FOLDER'], backup_file)
-        with open(backup_path, 'w') as f:
+        temp_backup_path = backup_path + '.tmp'
+        with open(temp_backup_path, 'w') as f:
+            json.dump(results, f, indent=2)
+        os.rename(temp_backup_path, backup_path)  # Atomic operation
+        
+        # Create permanent backup in separate directory
+        backup_dir = os.path.join(app.config['UPLOAD_FOLDER'], '..', 'backups')
+        os.makedirs(backup_dir, exist_ok=True)
+        permanent_backup = os.path.join(backup_dir, backup_file)
+        with open(permanent_backup, 'w') as f:
             json.dump(results, f, indent=2)
         
-        logging.info(f"Results saved with backup: {results_file} and {backup_file}")
+        logging.info(f"Results saved with multiple backups: {results_file}, {backup_file}, and permanent backup")
         
         # Save file information to database for persistent storage
         new_file = UploadedFile()

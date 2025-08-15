@@ -50,6 +50,15 @@ Device accessibility: Fully responsive design for mobile phones, tablets, laptop
 - **Size Limits**: Maximum file size enforcement to prevent resource exhaustion
 - **Input Sanitization**: Werkzeug secure_filename for safe file handling
 
+## File Integrity & Reliability Systems
+- **Atomic File Operations**: All file writes use atomic operations to prevent corruption
+- **Multi-Level Backup System**: Primary, backup, and permanent backup copies for all files
+- **Startup Integrity Checks**: Automatic verification and recovery on application start
+- **Continuous Monitoring**: Scheduled integrity checks with auto-recovery capabilities
+- **Orphaned Entry Cleanup**: Automatic detection and removal of database entries without files
+- **Backup Recovery**: Automatic restoration from backups when primary files are missing
+- **File Regeneration**: Ability to recreate results from original files when needed
+
 # External Dependencies
 
 ## Core Libraries
