@@ -60,18 +60,47 @@ class UploadedFile(db.Model):
     
     @classmethod
     def get_file_by_id(cls, file_id, keyword=None):
-        """Get a file by its ID, optionally filtered by keyword."""
-        query = cls.query.filter_by(id=file_id)
-        if keyword:
-            query = query.filter_by(keyword=keyword)
+        """Get a file by its ID, optionally filtered by keyword with enhanced reliability."""
+        import os
+        import json
         
-        file_obj = query.first()
-        if file_obj:
-            logging.info(f"Found file: {file_obj.filename}, results_file: {file_obj.results_file}")
-        else:
-            logging.error(f"File not found: {file_id} with keyword: {keyword}")
-        
-        return file_obj
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                query = cls.query.filter_by(id=file_id)
+                if keyword:
+                    query = query.filter_by(keyword=keyword)
+                
+                file_obj = query.first()
+                if file_obj:
+                    logging.info(f"Found file: {file_obj.filename}, results_file: {file_obj.results_file}")
+                    
+                    # Verify file integrity if found
+                    if file_obj.results_file:
+                        results_path = os.path.join('uploads', file_obj.results_file)
+                        backup_path = results_path.replace('.json', '_backup.json')
+                        
+                        # Check if results file exists, if not try backup
+                        if not os.path.exists(results_path) and os.path.exists(backup_path):
+                            # Restore from backup
+                            with open(backup_path, 'r') as f:
+                                backup_data = json.load(f)
+                            with open(results_path, 'w') as f:
+                                json.dump(backup_data, f, indent=2)
+                            logging.info(f"Restored results file from backup: {results_path}")
+                else:
+                    logging.error(f"File not found: {file_id} with keyword: {keyword}")
+                
+                return file_obj
+            except Exception as e:
+                logging.error(f"Database query attempt {attempt + 1} failed: {str(e)}")
+                if attempt < max_retries - 1:
+                    db.session.rollback()
+                    db.engine.dispose()  # Force reconnection
+                    import time
+                    time.sleep(0.5)  # Brief delay before retry
+                else:
+                    raise e
     
     @classmethod
     def get_keyword_files(cls, workspace, keyword, limit=25):

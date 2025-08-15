@@ -8,6 +8,7 @@ class MutationWorkspace {
         this.currentFileId = null;
         this.dataTable = null;
         this.workspace = window.WORKSPACE;
+        this.fileCache = new FileCache();
         this.init();
     }
 
@@ -15,6 +16,14 @@ class MutationWorkspace {
         this.setupEventListeners();
         this.loadHistory();
         this.setupMobileMenu();
+        
+        // Initialize caching system for offline reliability
+        if (this.fileCache.isSupported()) {
+            const stats = this.fileCache.getCacheStats();
+            console.log('File cache initialized:', stats);
+        } else {
+            console.warn('Browser storage not available - reduced offline capability');
+        }
     }
 
     setupEventListeners() {
@@ -269,14 +278,29 @@ class MutationWorkspace {
         const workspace = window.WORKSPACE || this.workspace;
         console.log('Loading file data for:', fileId, 'workspace:', workspace);
         
-        // Enhanced error handling with retry mechanism for deployment stability
+        // Try cached data first for offline reliability
+        if (this.fileCache.isSupported()) {
+            const cachedData = this.fileCache.getCachedFileData(fileId);
+            if (cachedData) {
+                console.log('Using cached data for offline access');
+                this.currentFileId = fileId;
+                this.renderFileData(cachedData);
+                this.hideLoadingSpinner();
+                this.showToast('Offline Mode', 'Displaying cached file data - limited connectivity detected', 'info');
+                return;
+            }
+        }
+
+        // Enhanced error handling with retry mechanism and offline support
         const loadWithRetry = (attempt = 1) => {
             fetch(`/api/${workspace}/file/${fileId}`, {
                 method: 'GET',
                 headers: {
                     'Cache-Control': 'no-cache',
-                    'Pragma': 'no-cache'
-                }
+                    'Pragma': 'no-cache',
+                    'Connection': 'keep-alive'
+                },
+                timeout: 30000  // 30 second timeout
             })
             .then(response => {
                 if (!response.ok) {
@@ -290,6 +314,12 @@ class MutationWorkspace {
             .then(data => {
                 if (data.success && data.file_data) {
                     this.currentFileId = fileId;
+                    
+                    // Cache the data for offline access
+                    if (this.fileCache.isSupported()) {
+                        this.fileCache.cacheFileData(fileId, data.file_data);
+                    }
+                    
                     this.renderFileData(data.file_data);
                     this.hideLoadingSpinner();
                 } else {
@@ -301,17 +331,34 @@ class MutationWorkspace {
             .catch(error => {
                 console.error(`Load file attempt ${attempt} failed:`, error);
                 
-                // Retry on server errors or network issues
-                if (attempt < 3 && (error.message.includes('Server Error') || error.message.includes('Failed to fetch'))) {
+                // Retry on server errors, network issues, or timeouts
+                const shouldRetry = (
+                    error.message.includes('Server Error') || 
+                    error.message.includes('Failed to fetch') ||
+                    error.message.includes('timeout') ||
+                    error.message.includes('NetworkError') ||
+                    error.name === 'TypeError'
+                );
+                
+                if (attempt < 5 && shouldRetry) {
+                    const delay = Math.min(1000 * Math.pow(2, attempt - 1), 10000); // Exponential backoff max 10s
                     setTimeout(() => {
-                        console.log(`Retrying file load, attempt ${attempt + 1}`);
+                        console.log(`Retrying file load, attempt ${attempt + 1} after ${delay}ms`);
                         loadWithRetry(attempt + 1);
-                    }, 1000 * attempt); // Exponential backoff
+                    }, delay);
                 } else {
                     const errorMessage = error.error || error.message || 'Failed to load file data';
-                    this.showToast('File Error', `${errorMessage}${attempt > 1 ? ' (after retries)' : ''}`, 'danger');
+                    
+                    if (attempt > 1) {
+                        this.showToast('Connection Issue', 
+                            `File data could not be loaded after ${attempt} attempts. The file is safely stored and will be available when connection is restored.`, 
+                            'warning');
+                    } else {
+                        this.showToast('File Error', errorMessage, 'danger');
+                    }
+                    
                     this.hideLoadingSpinner();
-                    console.error('Final load error:', error);
+                    console.error('Final load error after', attempt, 'attempts:', error);
                 }
             });
         };

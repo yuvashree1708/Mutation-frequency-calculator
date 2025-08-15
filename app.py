@@ -57,8 +57,9 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 with app.app_context():
     try:
         db.create_all()
-        # Test connection
-        db.session.execute("SELECT 1")
+        # Test connection with proper SQLAlchemy syntax
+        from sqlalchemy import text
+        db.session.execute(text("SELECT 1"))
         db.session.commit()
         logging.info("Database connection established successfully")
     except Exception as db_error:
@@ -172,13 +173,22 @@ def upload_file(workspace_name):
         mutated_positions = [r['Position'] for r in results if r['Color'] == 'Red']
         low_conf_positions = [r['Position'] for r in results if r['Ambiguity'] == 'Low-confidence']
         
-        # Store results in a temporary file to avoid large sessions
+        # Store results permanently with backup for reliability
         import json
         results_file = f"results_{file_id}.json"
         results_path = os.path.join(app.config['UPLOAD_FOLDER'], results_file)
         
+        # Save primary results file
         with open(results_path, 'w') as f:
-            json.dump(results, f)
+            json.dump(results, f, indent=2)  # Pretty print for debugging
+        
+        # Create backup copy for redundancy
+        backup_file = f"results_{file_id}_backup.json"
+        backup_path = os.path.join(app.config['UPLOAD_FOLDER'], backup_file)
+        with open(backup_path, 'w') as f:
+            json.dump(results, f, indent=2)
+        
+        logging.info(f"Results saved with backup: {results_file} and {backup_file}")
         
         # Save file information to database for persistent storage
         new_file = UploadedFile()
@@ -261,7 +271,8 @@ def get_file_data(workspace_name, file_id):
     
     # Test database connectivity first
     try:
-        db.session.execute("SELECT 1")
+        from sqlalchemy import text
+        db.session.execute(text("SELECT 1"))
         db.session.commit()
     except Exception as db_test_error:
         logging.error(f"Database connectivity test failed: {str(db_test_error)}")
@@ -307,33 +318,50 @@ def get_file_data(workspace_name, file_id):
         results_path = os.path.join(app.config['UPLOAD_FOLDER'], file_data['results_file'])
         
         if not os.path.exists(results_path):
-            logging.error(f"Results file missing: {results_path}")
-            # Try to regenerate results from original file if it exists
-            # Check multiple possible locations for the original file
-            possible_paths = []
-            if uploaded_file.uploaded_file_path:
-                possible_paths.append(os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.uploaded_file_path))
+            logging.error(f"Primary results file missing: {results_path}")
             
-            # Also try the filename
-            possible_paths.append(os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename))
+            # Try backup file first
+            backup_file = file_data['results_file'].replace('.json', '_backup.json')
+            backup_path = os.path.join(app.config['UPLOAD_FOLDER'], backup_file)
             
-            # Try to find any matching file
-            original_file_path = None
-            for path in possible_paths:
-                if os.path.exists(path):
-                    original_file_path = path
-                    break
+            if os.path.exists(backup_path):
+                logging.info(f"Using backup results file: {backup_path}")
+                results_path = backup_path
+            else:
+                logging.error(f"Backup file also missing: {backup_path}")
+                # Try to regenerate results from original file if it exists
+                # Check multiple possible locations for the original file
+                possible_paths = []
+                if uploaded_file.uploaded_file_path:
+                    possible_paths.append(os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.uploaded_file_path))
+                
+                # Also try the filename and variations
+                possible_paths.append(os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename))
+                possible_paths.append(os.path.join(app.config['UPLOAD_FOLDER'], f"{file_id}_{uploaded_file.filename}"))
+                
+                # Try to find any matching file
+                original_file_path = None
+                for path in possible_paths:
+                    if os.path.exists(path):
+                        original_file_path = path
+                        break
             
             if original_file_path:
                 logging.info(f"Regenerating results from original file: {original_file_path}")
                 try:
                     from mutation_analyzer import analyze_mutations
-                    results, _ = analyze_mutations(original_file_path)
+                    results, output_file = analyze_mutations(original_file_path)
                     
-                    # Save regenerated results
+                    # Save regenerated results with backup
                     with open(results_path, 'w') as f:
                         json.dump(results, f)
-                    logging.info(f"Results regenerated successfully: {results_path}")
+                    
+                    # Create backup copy for reliability
+                    backup_path = results_path.replace('.json', '_backup.json')
+                    with open(backup_path, 'w') as f:
+                        json.dump(results, f)
+                    
+                    logging.info(f"Results regenerated successfully with backup: {results_path}")
                 except Exception as regen_error:
                     logging.error(f"Failed to regenerate results: {str(regen_error)}")
                     return jsonify({'error': 'Results file not found and cannot be regenerated'}), 404
