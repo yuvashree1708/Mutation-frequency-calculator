@@ -9,6 +9,7 @@ class MutationWorkspace {
         this.dataTable = null;
         this.workspace = window.WORKSPACE;
         this.fileCache = new FileCache();
+        this.isUploading = false; // Prevent concurrent uploads
         this.init();
     }
 
@@ -33,15 +34,16 @@ class MutationWorkspace {
             const input = document.getElementById(inputId);
             if (input) {
                 input.addEventListener('change', (e) => {
-                    if (e.target.files.length > 0) {
+                    if (e.target.files.length > 0 && !this.isUploading) {
                         const file = e.target.files[0];
                         const validation = this.validateFile(file);
                         
                         if (validation.valid) {
                             this.uploadFile(file);
+                            this.clearAllFileInputs(); // Clear all inputs immediately
                         } else {
                             this.showToast('Error', validation.error, 'danger');
-                            e.target.value = '';
+                            this.clearAllFileInputs();
                         }
                     }
                 });
@@ -129,8 +131,17 @@ class MutationWorkspace {
     }
 
     uploadFile(file) {
+        // Prevent concurrent uploads
+        if (this.isUploading) {
+            this.showToast('Info', 'Upload already in progress. Please wait.', 'info');
+            return;
+        }
+        
+        this.isUploading = true;
+        
         const formData = new FormData();
         formData.append('file', file);
+        formData.append('file_hash', this.calculateFileHash(file)); // Add file hash for duplicate detection
 
         // Show upload progress with file size info
         this.showUploadProgress();
@@ -155,6 +166,8 @@ class MutationWorkspace {
         });
 
         xhr.onload = () => {
+            this.isUploading = false; // Reset upload state
+            
             if (xhr.status === 200) {
                 const data = JSON.parse(xhr.responseText);
                 
@@ -164,9 +177,6 @@ class MutationWorkspace {
                     this.updateUploadStatus('');
                     this.loadHistory(); // Refresh history
                     this.loadFileData(data.file_id); // Load the new file
-                    
-                    // Clear file input
-                    document.getElementById('fileInput').value = '';
                 } else {
                     this.hideUploadProgress();
                     this.showToast('Error', data.error, 'danger');
@@ -180,6 +190,7 @@ class MutationWorkspace {
         };
 
         xhr.onerror = () => {
+            this.isUploading = false; // Reset upload state
             this.hideUploadProgress();
             this.showToast('Error', 'Upload failed: Network error', 'danger');
             this.updateUploadStatus('Upload failed');
@@ -187,6 +198,7 @@ class MutationWorkspace {
 
         xhr.timeout = 300000; // 5 minutes timeout for large files
         xhr.ontimeout = () => {
+            this.isUploading = false; // Reset upload state
             this.hideUploadProgress();
             this.showToast('Error', 'Upload timed out. File may be too large.', 'danger');
             this.updateUploadStatus('Upload timed out');
@@ -198,6 +210,22 @@ class MutationWorkspace {
         
         xhr.open('POST', `/upload/${currentWorkspace}`);
         xhr.send(formData);
+    }
+    
+    clearAllFileInputs() {
+        // Clear all file input elements to prevent duplicate uploads
+        const fileInputs = ['fileInput', 'fileInputSidebar', 'fileInputMain'];
+        fileInputs.forEach(inputId => {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.value = '';
+            }
+        });
+    }
+    
+    calculateFileHash(file) {
+        // Create a simple hash based on file name, size, and last modified
+        return btoa(`${file.name}_${file.size}_${file.lastModified}`);
     }
 
     loadHistory() {

@@ -169,40 +169,64 @@ def upload_file(workspace_name):
         logging.error(f"Invalid workspace: {workspace_name}")
         return jsonify({'error': 'Invalid workspace'}), 400
     
-    # Get keyword from session or set default for workspace
-    keyword = session.get(f'{workspace_name}_keyword')
-    logging.info(f"Session keyword for {workspace_name}: {keyword}")
+    # Check for concurrent upload session flag
+    user_session_id = get_user_session_id()
+    upload_session_key = f'uploading_{user_session_id}_{workspace_name}'
     
-    # If no keyword in session, use default based on workspace
-    if not keyword:
-        if workspace_name == 'denv':
-            keyword = 'DENV'
-        elif workspace_name == 'chikv':
-            keyword = 'CHIKV'
-        
-        # Store the keyword in session
-        session[f'{workspace_name}_keyword'] = keyword
-        session.permanent = True
-        logging.info(f"Set default keyword for {workspace_name}: {keyword}")
-        
-    if 'file' not in request.files:
-        logging.error("No file in request")
-        return jsonify({'error': 'No file selected'}), 400
+    if session.get(upload_session_key):
+        logging.warning(f"Duplicate upload attempt blocked for session: {user_session_id}")
+        return jsonify({'error': 'Upload already in progress. Please wait for the current upload to complete.'}), 429
     
-    file = request.files['file']
-    if file.filename == '':
-        logging.error("Empty filename")
-        return jsonify({'error': 'No file selected'}), 400
+    # Set upload session flag
+    session[upload_session_key] = True
+    session.permanent = True
     
-    logging.info(f"Processing file: {file.filename}, size: {len(file.read())} bytes")
-    file.seek(0)  # Reset file pointer after reading size
-    
-    if not allowed_file(file.filename):
-        logging.error(f"Invalid file format: {file.filename}")
-        return jsonify({'error': 'Invalid file format. Supported formats: FASTA, FA, TXT, CSV, FAS, ALN, SEQ, MSA, PHYLIP, PHY, NEX, NEXUS'}), 400
-    
-    filepath = None
     try:
+        # Get keyword from session or set default for workspace
+        keyword = session.get(f'{workspace_name}_keyword')
+        logging.info(f"Session keyword for {workspace_name}: {keyword}")
+        
+        # If no keyword in session, use default based on workspace
+        if not keyword:
+            if workspace_name == 'denv':
+                keyword = 'DENV'
+            elif workspace_name == 'chikv':
+                keyword = 'CHIKV'
+            
+            # Store the keyword in session
+            session[f'{workspace_name}_keyword'] = keyword
+            session.permanent = True
+            logging.info(f"Set default keyword for {workspace_name}: {keyword}")
+            
+        if 'file' not in request.files:
+            logging.error("No file in request")
+            return jsonify({'error': 'No file selected'}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            logging.error("Empty filename")
+            return jsonify({'error': 'No file selected'}), 400
+        
+        # Check for duplicate upload using file hash
+        file_hash = request.form.get('file_hash')
+        if file_hash:
+            recent_upload_key = f'recent_upload_{user_session_id}_{file_hash}'
+            if session.get(recent_upload_key):
+                logging.warning(f"Duplicate file upload blocked: {file.filename}")
+                return jsonify({'error': 'This file was recently uploaded. Please wait before uploading the same file again.'}), 409
+            
+            # Set recent upload flag (expires in 30 seconds)
+            session[recent_upload_key] = True
+            session.permanent = True
+        
+        logging.info(f"Processing file: {file.filename}, size: {len(file.read())} bytes")
+        file.seek(0)  # Reset file pointer after reading size
+        
+        if not allowed_file(file.filename):
+            logging.error(f"Invalid file format: {file.filename}")
+            return jsonify({'error': 'Invalid file format. Supported formats: FASTA, FA, TXT, CSV, FAS, ALN, SEQ, MSA, PHYLIP, PHY, NEX, NEXUS'}), 400
+        
+        filepath = None
         # Generate unique file ID and save uploaded file permanently with atomic write
         file_id = str(uuid.uuid4())
         filename = secure_filename(file.filename or 'uploaded_file')
@@ -223,6 +247,9 @@ def upload_file(workspace_name):
             dst.write(src.read())
         
         logging.info(f"File saved permanently: {permanent_filename}")
+        
+        # Clear upload session flag before processing (processing can take time)
+        session.pop(upload_session_key, None)
         
         # Process the file
         results, output_file = analyze_mutations(filepath)
@@ -293,6 +320,14 @@ def upload_file(workspace_name):
             logging.info(f"Database transaction completed successfully: {file_id}")
             logging.debug(f"File processed: {filename}, mutations at positions: {mutated_positions[:10]}...")
             
+            # Log successful upload activity
+            UserActivity.log_activity(user_session_id, workspace_name, 'file_upload', {
+                'file_id': file_id,
+                'filename': filename,
+                'file_size': len(file.read())
+            }, file_id)
+            file.seek(0)  # Reset file pointer
+            
         except Exception as db_error:
             db.session.rollback()
             logging.error(f"Database transaction failed, rolling back: {str(db_error)}")
@@ -331,6 +366,17 @@ def upload_file(workspace_name):
         # Don't clean up uploaded files on error - keep them for debugging and potential recovery
         logging.error(f"File processing failed but uploaded file preserved: {filepath if 'filepath' in locals() else 'unknown'}")
         return jsonify({'error': f'Error processing file: {str(e)}'}), 500
+    
+    finally:
+        # Always clear upload session flag
+        session.pop(upload_session_key, None)
+        
+        # Clear recent upload tracking
+        file_hash = request.form.get('file_hash')
+        if file_hash:
+            recent_upload_key = f'recent_upload_{user_session_id}_{file_hash}'
+            # Remove the recent upload flag after processing
+            session.pop(recent_upload_key, None)
 
 @app.route('/download/<filename>')
 def download_file(filename):
