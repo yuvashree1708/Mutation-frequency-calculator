@@ -1,6 +1,6 @@
 Mutation Frequency Calculator
 
-A lightweight, open-source tool designed for analyzing mutation frequency in viral protein datasets. Built to parse residues position-wise from large viral genome sequences, this calculator helps researchers understand the plasticity of viruses how often residues change, and which regions remain stable or uncertain.
+A lightweight, tool designed for analyzing mutation frequency in viral protein datasets. Built to parse residues position-wise from large viral genome sequences, this calculator helps researchers understand the plasticity of viruses how often residues change, and which regions remain stable or uncertain.
 
 ✨ Features
 
